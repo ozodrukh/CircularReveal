@@ -1,0 +1,37 @@
+<io.codetail.widget.FrameLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/cardsGroup"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingTop="112dp"
+        android:paddingBottom="8dp"
+        />
+
+
+    <io.codetail.circualrevealsample.widget.FloatingActionButton
+        android:id="@+id/floatingActionButton"
+        android:layout_width="74dp"
+        android:layout_height="74dp"
+        android:layout_gravity="right|bottom"
+        android:layout_marginBottom="@dimen/activity_vertical_margin"
+        app:actionColor="?attr/colorAccent"
+        app:actionIcon="@drawable/ic_refresh_white_24dp"
+        />
+
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorPrimary"
+        android:minHeight="?attr/actionBarSize"
+        />
+
+</io.codetail.widget.FrameLayoutCompat>

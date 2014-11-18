@@ -1,0 +1,19 @@
+<resources>
+
+    <declare-styleable name="FloatingActionButton">
+        <attr name="actionIcon" format="reference" />
+        <attr name="actionColor" format="color" />
+    </declare-styleable>
+
+
+    <!-- Floating Action Button (FAB) -->
+    <dimen name="fab_inner_circle_offset">8dp</dimen>
+    <dimen name="fab_action_icon_size">24dp</dimen>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorAccent">#294BCC</item>
+    </style>
+
+</resources>
