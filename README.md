@@ -7,6 +7,10 @@ Lollipop ViewAnimationUtils.createCircularReveal for everyone 2.3+
 " target="_blank"><img src="http://img.youtube.com/vi/_vVpwzYb4Dg/0.jpg" 
 alt="Ripple DEMO" width="320" height="240" border="10" /></a>
 
+Sample
+======
+<a href="https://github.com/03uk/CircularReveal/releases/tag/1.0"> get it </a>
+
 Note
 ====
 
