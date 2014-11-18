@@ -14,7 +14,7 @@ Sample
 Note
 ====
 
-depends from Jake Whartong's NineOldsAndroid, or use my modifed version (included auto cancel)
+depends from Jake Wharton's NineOldsAndroid, or use my modifed version (included auto cancel)
 
 Using
 ======
