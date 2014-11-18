@@ -25,7 +25,7 @@ Using
     android:layout_width="match_parent"
     android:layout_height="match_parent">
     
-    <!-- Include any views you want  -->
+    <!-- Put more views here if you want, it's stock frame layout from Lollipop :) Tested under Gingerbread (but not fully)  -->
 
     <android.support.v7.widget.CardView
         xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -48,23 +48,21 @@ Using
 
 ```java
 
-                View myView = findView(R.id.awesome_card);
+    View myView = findView(R.id.awesome_card);
 
-                // get the center for the clipping circle
-                //int cx = (myView.getLeft() + myView.getRight()) / 2;
-                //int cy = (myView.getTop() + myView.getBottom()) / 2;
-                int cx = myView.getRight() / 2;
-                int cy = myView.getBottom() / 2;
+    // get the center for the clipping circle
+    int cx = (myView.getLeft() + myView.getRight()) / 2;
+    int cy = (myView.getTop() + myView.getBottom()) / 2;
 
-                // get the final radius for the clipping circle
-                int finalRadius = Math.max(myView.getWidth(), myView.getHeight());
+    // get the final radius for the clipping circle
+    int finalRadius = Math.max(myView.getWidth(), myView.getHeight());
 
-                ObjectAnimator animator = (ObjectAnimator)
-                        ViewAnimationUtils.createCircularReveal(myView, cx, cy, 0, finalRadius);
-                animator.setInterpolator(new AccelerateInterpolator());
-                animator.setDuration(500);
-                animator.setAutoCancel(true);
-                animator.start();
+    ObjectAnimator animator = (ObjectAnimator)
+            ViewAnimationUtils.createCircularReveal(myView, cx, cy, 0, finalRadius);
+    animator.setInterpolator(new AccelerateInterpolator());
+    animator.setDuration(500);
+    animator.setAutoCancel(true);
+    animator.start();
 
 ```
 
