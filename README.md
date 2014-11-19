@@ -2,3 +2,91 @@ CircularReveal
 ==============
 
 Lollipop ViewAnimationUtils.createCircularReveal for everyone 2.3+
+
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=_vVpwzYb4Dg
+" target="_blank"><img src="http://img.youtube.com/vi/_vVpwzYb4Dg/0.jpg" 
+alt="Ripple DEMO" width="320" height="240" border="10" /></a>
+
+Sample
+======
+<a href="https://github.com/03uk/CircularReveal/releases/tag/1.0"> get it </a>
+
+Note
+====
+
+depends from Jake Wharton's NineOldsAndroid, or use my modifed version (included auto cancel)
+
+Using
+======
+
+```xml
+<io.codetail.widget.RevealFrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    
+    <!-- Put more views here if you want, it's stock frame layout from Lollipop :) Tested under Gingerbread (but not fully)  -->
+
+    <android.support.v7.widget.CardView
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/awesome_card"
+        style="@style/CardView"
+        app:cardBackgroundColor="@color/material_deep_teal_500"
+        app:cardElevation="2dp"
+        app:cardPreventCornerOverlap="false"
+        app:cardUseCompatPadding="true"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:layout_gravity="center_horizontal"
+        />
+
+</io.codetail.widget.RevealFrameLayout>
+```
+
+```java
+
+    View myView = findView(R.id.awesome_card);
+
+    // get the center for the clipping circle
+    int cx = (myView.getLeft() + myView.getRight()) / 2;
+    int cy = (myView.getTop() + myView.getBottom()) / 2;
+
+    // get the final radius for the clipping circle
+    int finalRadius = Math.max(myView.getWidth(), myView.getHeight());
+
+    ObjectAnimator animator = (ObjectAnimator)
+            ViewAnimationUtils.createCircularReveal(myView, cx, cy, 0, finalRadius);
+    animator.setInterpolator(new AccelerateInterpolator());
+    animator.setDuration(500);
+    animator.setAutoCancel(true);
+    animator.start();
+
+```
+
+License
+--------
+
+    The MIT License (MIT)
+
+    Copyright (c) 2014 Abdullaev Ozodrukh
+    
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+    
+    The above copyright notice and this permission notice shall be included in
+    all copies or substantial portions of the Software.
+    
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+    THE SOFTWARE.
