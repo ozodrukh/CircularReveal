@@ -31,9 +31,14 @@ public class ViewAnimationUtils {
      * @param startRadius The starting radius of the animating circle.
      * @param endRadius The ending radius of the animating circle.
      */
-    public static Animator createCircularReveal(View view,
+    public static io.codetail.animation.Animator createCircularReveal(View view,
                                                 int centerX,  int centerY,
                                                 float startRadius, float endRadius) {
+
+        if(io.codetail.animation.Animator.LOLLIPOP){
+            return new io.codetail.animation.Animator(android.view.ViewAnimationUtils
+                    .createCircularReveal(view, centerX, centerY, startRadius, endRadius));
+        }
 
         if(!(view.getParent() instanceof RevealAnimator)){
             throw new IllegalArgumentException("View must be inside dreamers.widget.RevealLayout.");
@@ -46,10 +51,10 @@ public class ViewAnimationUtils {
         Rect bounds = new Rect();
         view.getHitRect(bounds);
 
-        Animator reveal = ObjectAnimator.ofFloat(revealLayout, "revealRadius", startRadius, endRadius);
+        ObjectAnimator reveal = ObjectAnimator.ofFloat(revealLayout, "revealRadius", startRadius, endRadius);
         reveal.addListener(new RevealAnimator.RevealFinished(revealLayout, bounds));
 
-        return reveal;
+        return new io.codetail.animation.Animator(reveal);
     }
 
     /**

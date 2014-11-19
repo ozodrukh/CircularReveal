@@ -22,6 +22,7 @@ import java.lang.ref.WeakReference;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import io.codetail.animation.Animator;
 import io.codetail.animation.ViewAnimationUtils;
 import io.codetail.circualrevealsample.widget.FloatingActionButton;
 import io.codetail.circualrevealsample.widget.ViewUtils;
@@ -59,7 +60,6 @@ public class MainActivity extends ActionBarActivity{
         mCardsGroup.setClipToPadding(false);
         mCardsGroup.setAdapter(mCardsAdapter);
         mCardsGroup.setLayoutManager(mLayoutManager);
-        mCardsGroup.setOnScrollListener(new HideExtraOnScroll(mToolbar));
 
         mToolbar.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
@@ -88,15 +88,31 @@ public class MainActivity extends ActionBarActivity{
                 // get the final radius for the clipping circle
                 int finalRadius = Math.max(myView.getWidth(), myView.getHeight()) + 100;
 
-                ObjectAnimator animator = (ObjectAnimator)
+                Animator animator =
                         ViewAnimationUtils.createCircularReveal(myView, cx, cy, 0, finalRadius);
                 animator.setInterpolator(new AccelerateInterpolator());
                 animator.setDuration(500);
-                animator.setAutoCancel(true);
+
+                if(Animator.LOLLIPOP){
+                    android.animation.ObjectAnimator a = (android.animation.ObjectAnimator)
+                            animator.getNativeAnimator();
+                    a.setAutoCancel(true);
+                }else{
+                    ObjectAnimator a = (ObjectAnimator)
+                            animator.getSupportAnimator();
+                    a.setAutoCancel(true);
+                }
+
                 animator.start();
             }
         });
 
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mCardsGroup.setOnScrollListener(new HideExtraOnScroll(mToolbar));
     }
 
     @Override

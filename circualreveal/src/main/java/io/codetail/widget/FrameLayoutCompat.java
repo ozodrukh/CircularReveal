@@ -23,15 +23,16 @@ import android.widget.FrameLayout;
 
 import java.util.ArrayList;
 
+import io.codetail.animation.Animator;
 import io.codetail.view.R;
 
 // Port of FrameLayout for Android 2.3 Gingerbread
 public class FrameLayoutCompat extends ViewGroup{
 
-    private static final int DEFAULT_CHILD_GRAVITY = Gravity.TOP | Gravity.START;
-    private static final boolean FEATURES_HONEYCOMB = Build.VERSION.SDK_INT > 10;
-    private static final boolean FEATURES_KITKAT = Build.VERSION.SDK_INT > 16;
-    private static final boolean FEATURES_LOLLIPOP = Build.VERSION.SDK_INT > 16;
+    static final int DEFAULT_CHILD_GRAVITY = Gravity.TOP | Gravity.START;
+    static final boolean FEATURES_HONEYCOMB = Build.VERSION.SDK_INT > 10;
+    static final boolean FEATURES_KITKAT = Build.VERSION.SDK_INT > 16;
+    static final boolean FEATURES_LOLLIPOP = Animator.LOLLIPOP;
 
     boolean mMeasureAllChildren = false;
 

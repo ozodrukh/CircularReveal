@@ -32,6 +32,10 @@ public class RevealFrameLayout extends FrameLayoutCompat implements RevealAnimat
     public RevealFrameLayout(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
 
+        if(FEATURES_HONEYCOMB && !FEATURES_KITKAT){
+            setLayerType(LAYER_TYPE_SOFTWARE, null);
+        }
+
         mRevealPath = new Path();
     }
 
