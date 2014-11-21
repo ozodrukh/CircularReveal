@@ -94,9 +94,7 @@ public class MainActivity extends ActionBarActivity{
                 animator.setDuration(500);
 
                 if(Animator.LOLLIPOP){
-                    android.animation.ObjectAnimator a = (android.animation.ObjectAnimator)
-                            animator.getNativeAnimator();
-                    a.setAutoCancel(true);
+                    android.animation.Animator a = animator.getNativeAnimator();
                 }else{
                     ObjectAnimator a = (ObjectAnimator)
                             animator.getSupportAnimator();

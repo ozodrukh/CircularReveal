@@ -42,6 +42,10 @@ public class FloatingActionButton extends View{
         setFocusable(true);
         setClickable(true);
 
+        if(Build.VERSION.SDK_INT > 14 && Build.VERSION.SDK_INT < 16){
+            setLayerType(LAYER_TYPE_SOFTWARE, null);
+        }
+
         Resources r = context.getResources();
 
         mInnerCircleOffset = r.getDimensionPixelSize(R.dimen.fab_inner_circle_offset);
