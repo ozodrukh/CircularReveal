@@ -30,6 +30,11 @@ public class RevealLinearLayout extends LinearLayoutCompat {
 
     public RevealLinearLayout(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
+        
+        if(FEATURES_HONEYCOMB && !FEATURES_KITKAT){
+            setLayerType(LAYER_TYPE_SOFTWARE, null);
+        }
+
 
         mRevealPath = new Path();
     }
