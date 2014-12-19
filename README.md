@@ -21,6 +21,8 @@ depends from Jake Wharton's NineOldsAndroid, or use my modifed version (included
 Using
 ======
 
+Use regular `RevealFrameLayout` & `RevealLinearLayout` don't worry, only target will be clipped :)
+
 ```xml
 <io.codetail.widget.RevealFrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
