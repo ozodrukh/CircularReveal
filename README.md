@@ -29,7 +29,7 @@ Use regular `RevealFrameLayout` & `RevealLinearLayout` don't worry, only target 
     android:layout_width="match_parent"
     android:layout_height="match_parent">
     
-    <!-- Put more views here if you want, it's stock frame layout from Lollipop :) Tested under Gingerbread (but not fully)  -->
+    <!-- Put more views here if you want, it's stock frame layout from Lollipop :)   -->
 
     <android.support.v7.widget.CardView
         xmlns:app="http://schemas.android.com/apk/res-auto"
