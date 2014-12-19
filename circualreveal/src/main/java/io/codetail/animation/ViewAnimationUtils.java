@@ -41,7 +41,7 @@ public class ViewAnimationUtils {
         }
 
         if(!(view.getParent() instanceof RevealAnimator)){
-            throw new IllegalArgumentException("View must be inside dreamers.widget.RevealLayout.");
+            throw new IllegalArgumentException("View must be inside RevealFrameLayout or RevealLinearLayout.");
         }
 
         RevealAnimator revealLayout = (RevealAnimator) view.getParent();
