@@ -11,7 +11,7 @@ alt="Ripple DEMO" width="320" height="240" border="10" /></a>
 
 Sample
 ======
-<a href="https://github.com/03uk/CircularReveal/releases/tag/1.0.1"> Sample & .aar file </a>
+<a href="https://github.com/ozodrukh/CircularReveal/releases"> Sample & .aar file </a>
 
 Note
 ====
