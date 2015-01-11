@@ -1,4 +1,4 @@
-package io.codetail.widget;
+package io.codetail.circualrevealsample.widget;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
@@ -8,11 +8,13 @@ import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
-import android.graphics.PorterDuffColorFilter;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.v4.graphics.drawable.DrawableCompat;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.View;
@@ -23,16 +25,13 @@ import android.widget.FrameLayout;
 
 import java.util.ArrayList;
 
-import io.codetail.animation.Animator;
-import io.codetail.view.R;
+import io.codetail.circualrevealsample.R;
+
 
 // Port of FrameLayout for Android 2.3 Gingerbread
 public class FrameLayoutCompat extends ViewGroup{
 
     static final int DEFAULT_CHILD_GRAVITY = Gravity.TOP | Gravity.START;
-    static final boolean FEATURES_HONEYCOMB = Build.VERSION.SDK_INT > 10;
-    static final boolean FEATURES_KITKAT = Build.VERSION.SDK_INT > 16;
-    static final boolean FEATURES_LOLLIPOP = Animator.LOLLIPOP;
 
     boolean mMeasureAllChildren = false;
 
@@ -98,7 +97,7 @@ public class FrameLayoutCompat extends ViewGroup{
         }
 
         if (a.hasValue(R.styleable.FrameLayoutCompat_foregroundTintMode)) {
-            mForegroundTintMode = parseTintMode(a.getInt(
+            mForegroundTintMode = DrawableHelper.parseTintMode(a.getInt(
                     R.styleable.FrameLayoutCompat_foregroundTintMode, -1), mForegroundTintMode);
             mHasForegroundTintMode = true;
         }
@@ -115,17 +114,6 @@ public class FrameLayoutCompat extends ViewGroup{
         applyForegroundTint();
     }
 
-    public static PorterDuff.Mode parseTintMode(int value, PorterDuff.Mode defaultMode) {
-        switch (value) {
-            case 3: return PorterDuff.Mode.SRC_OVER;
-            case 5: return PorterDuff.Mode.SRC_IN;
-            case 9: return PorterDuff.Mode.SRC_ATOP;
-            case 14: return PorterDuff.Mode.MULTIPLY;
-            case 15: return PorterDuff.Mode.SCREEN;
-            case 16: return PorterDuff.Mode.ADD;
-            default: return defaultMode;
-        }
-    }
 
     /**
      * Describes how the foreground is positioned.
@@ -231,8 +219,8 @@ public class FrameLayoutCompat extends ViewGroup{
      * and a height of {@link android.view.ViewGroup.LayoutParams#MATCH_PARENT}.
      */
     @Override
-    protected LayoutParams generateDefaultLayoutParams() {
-        return new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+    protected FrameLayout.LayoutParams generateDefaultLayoutParams() {
+        return new FrameLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
     }
 
     /**
@@ -355,23 +343,12 @@ public class FrameLayoutCompat extends ViewGroup{
             mForeground = mForeground.mutate();
 
             if (mHasForegroundTint) {
-                if(FEATURES_LOLLIPOP) {
-                    mForeground.setTintList(mForegroundTintList);
-                }else{
-                    int color = mForegroundTintList.getColorForState(getDrawableState(), Color.TRANSPARENT);
-                    PorterDuffColorFilter filter = new PorterDuffColorFilter(color, PorterDuff.Mode.SRC_IN);
-                    mForeground.setColorFilter(filter);
-                }
+                DrawableCompat.setTint(mForeground, mForegroundTintList.
+                        getColorForState(getDrawableState(), Color.TRANSPARENT));
             }
 
             if (mHasForegroundTintMode) {
-                if(FEATURES_LOLLIPOP) {
-                    mForeground.setTintMode(mForegroundTintMode);
-                }else{
-                    int color = mForegroundTintList.getColorForState(getDrawableState(), Color.TRANSPARENT);
-                    PorterDuffColorFilter filter = new PorterDuffColorFilter(color, mForegroundTintMode);
-                    mForeground.setColorFilter(filter);
-                }
+                DrawableCompat.setTintMode(mForeground, mForegroundTintMode);
             }
         }
     }
@@ -423,9 +400,8 @@ public class FrameLayoutCompat extends ViewGroup{
                 maxHeight = Math.max(maxHeight,
                         child.getMeasuredHeight() + lp.topMargin + lp.bottomMargin);
 
-                if(FEATURES_HONEYCOMB) {
-                    childState = combineMeasuredStates(childState, child.getMeasuredState());
-                }
+                //combine
+                childState = childState | ViewCompat.getMeasuredState(child);
 
                 if (measureMatchParentChildren) {
                     if (lp.width == LayoutParams.MATCH_PARENT ||
@@ -452,8 +428,7 @@ public class FrameLayoutCompat extends ViewGroup{
         }
 
         setMeasuredDimension(resolveSizeAndState(maxWidth, widthMeasureSpec, childState),
-                resolveSizeAndState(maxHeight, heightMeasureSpec,
-                        FEATURES_HONEYCOMB ? childState << 16 : childState));
+                resolveSizeAndState(maxHeight, heightMeasureSpec, childState << 16));
 
         count = mMatchParentChildren.size();
         if (count > 1) {
@@ -579,12 +554,8 @@ public class FrameLayoutCompat extends ViewGroup{
 
                 final int absoluteGravity;
 
-                if(FEATURES_KITKAT) {
-                    final int layoutDirection = getLayoutDirection();
-                    absoluteGravity = Gravity.getAbsoluteGravity(gravity, layoutDirection);
-                }else{
-                    absoluteGravity = gravity;
-                }
+                final int layoutDirection = ViewCompat.getLayoutDirection(this);
+                absoluteGravity = GravityCompat.getAbsoluteGravity(gravity, layoutDirection);
 
                 final int verticalGravity = gravity & Gravity.VERTICAL_GRAVITY_MASK;
 
@@ -656,15 +627,10 @@ public class FrameLayoutCompat extends ViewGroup{
                     selfBounds.set(getPaddingLeft(), getPaddingTop(), w - getPaddingRight(), h - getPaddingBottom());
                 }
 
-                if(FEATURES_KITKAT) {
-                    final int layoutDirection = getLayoutDirection();
-                    Gravity.apply(mForegroundGravity, foreground.getIntrinsicWidth(),
-                            foreground.getIntrinsicHeight(), selfBounds, overlayBounds,
-                            layoutDirection);
-                }else{
-                    Gravity.apply(mForegroundGravity, foreground.getIntrinsicWidth(),
-                            foreground.getIntrinsicHeight(), selfBounds, overlayBounds);
-                }
+                final int layoutDirection = ViewCompat.getLayoutDirection(this);
+                GravityCompat.apply(mForegroundGravity, foreground.getIntrinsicWidth(),
+                        foreground.getIntrinsicHeight(), selfBounds, overlayBounds,
+                        layoutDirection);
 
 
                 foreground.setBounds(overlayBounds);
@@ -718,7 +684,7 @@ public class FrameLayoutCompat extends ViewGroup{
      * {@inheritDoc}
      */
     @Override
-    public LayoutParams generateLayoutParams(AttributeSet attrs) {
+    public FrameLayout.LayoutParams generateLayoutParams(AttributeSet attrs) {
         return new FrameLayout.LayoutParams(getContext(), attrs);
     }
 
@@ -732,14 +698,13 @@ public class FrameLayoutCompat extends ViewGroup{
      */
     @Override
     protected boolean checkLayoutParams(LayoutParams p) {
-        return p != null;
+        return p != null && p instanceof FrameLayout.LayoutParams;
     }
 
     @Override
-    protected LayoutParams generateLayoutParams(LayoutParams p) {
-        return new LayoutParams(p);
+    protected FrameLayout.LayoutParams generateLayoutParams(LayoutParams p) {
+        return new FrameLayout.LayoutParams(p);
     }
-
 
     @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
     @Override

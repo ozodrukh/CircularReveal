@@ -3,12 +3,11 @@ package io.codetail.widget;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Path;
-import android.support.annotation.NonNull;
-import android.support.v7.widget.LinearLayoutCompat;
 import android.util.AttributeSet;
 import android.view.View;
+import android.widget.LinearLayout;
 
-public class RevealLinearLayout extends LinearLayoutCompat {
+public class RevealLinearLayout extends LinearLayout{
 
     Path mRevealPath;
 
@@ -29,41 +28,50 @@ public class RevealLinearLayout extends LinearLayoutCompat {
     }
 
     public RevealLinearLayout(Context context, AttributeSet attrs, int defStyle) {
-        super(context, attrs, defStyle);
-        
-        if(FEATURES_HONEYCOMB && !FEATURES_KITKAT){
-            setLayerType(LAYER_TYPE_SOFTWARE, null);
-        }
-
-
+        super(context, attrs);
         mRevealPath = new Path();
     }
 
-    private void setTarget(View view){
+    /**
+     * @hide
+     */
+    public void setTarget(View view){
         mTarget = view;
     }
 
-    private void setCenter(float centerX, float centerY){
+    /**
+     * @hide
+     */
+    public void setCenter(float centerX, float centerY){
         mCenterX = centerX;
         mCenterY = centerY;
     }
 
-    private void setClipOutlines(boolean clip){
+    /**
+     * @hide
+     */
+    public void setClipOutlines(boolean clip){
         mClipOutlines = clip;
     }
 
-    private void setRevealRadius(float radius){
+    /**
+     * @hide
+     */
+    public void setRevealRadius(float radius){
         mRadius = radius;
         invalidate();
     }
 
-    private float getRevealRadius(){
+    /**
+     * @hide
+     */
+    public float getRevealRadius(){
         return mRadius;
     }
 
 
     @Override
-    protected boolean drawChild(@NonNull Canvas canvas, @NonNull View child, long drawingTime) {
+    protected boolean drawChild(Canvas canvas, View child, long drawingTime) {
         if (!mClipOutlines && child != mTarget)
             return super.drawChild(canvas, child, drawingTime);
 

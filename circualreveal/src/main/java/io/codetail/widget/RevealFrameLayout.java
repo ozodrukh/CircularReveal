@@ -3,13 +3,13 @@ package io.codetail.widget;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Path;
-import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 import android.view.View;
+import android.widget.FrameLayout;
 
 import io.codetail.animation.RevealAnimator;
 
-public class RevealFrameLayout extends FrameLayoutCompat implements RevealAnimator{
+public class RevealFrameLayout extends FrameLayout implements RevealAnimator{
 
     Path mRevealPath;
 
@@ -31,11 +31,6 @@ public class RevealFrameLayout extends FrameLayoutCompat implements RevealAnimat
 
     public RevealFrameLayout(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
-
-        if(FEATURES_HONEYCOMB && !FEATURES_KITKAT){
-            setLayerType(LAYER_TYPE_SOFTWARE, null);
-        }
-
         mRevealPath = new Path();
     }
 
@@ -93,7 +88,7 @@ public class RevealFrameLayout extends FrameLayoutCompat implements RevealAnimat
 
 
     @Override
-    protected boolean drawChild(@NonNull Canvas canvas, @NonNull View child, long drawingTime) {
+    protected boolean drawChild(Canvas canvas, View child, long drawingTime) {
         if(!mClipOutlines && child != mTarget)
             return super.drawChild(canvas, child, drawingTime);
 

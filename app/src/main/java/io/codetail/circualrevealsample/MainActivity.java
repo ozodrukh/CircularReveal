@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.Interpolator;
@@ -22,7 +23,7 @@ import java.lang.ref.WeakReference;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
-import io.codetail.animation.Animator;
+import io.codetail.animation.SupportAnimator;
 import io.codetail.animation.ViewAnimationUtils;
 import io.codetail.circualrevealsample.widget.FloatingActionButton;
 import io.codetail.circualrevealsample.widget.ViewUtils;
@@ -82,29 +83,24 @@ public class MainActivity extends ActionBarActivity{
                 // get the center for the clipping circle
                 //int cx = (myView.getLeft() + myView.getRight()) / 2;
                 //int cy = (myView.getTop() + myView.getBottom()) / 2;
-                int cx = myView.getRight() - 100;
-                int cy = myView.getBottom() - 100;
+                int cx = myView.getRight();
+                int cy = myView.getBottom();
 
                 // get the final radius for the clipping circle
-                int finalRadius = Math.max(myView.getWidth(), myView.getHeight()) + 100;
+                float finalRadius = hypo(myView.getWidth(), myView.getHeight());
 
-                Animator animator =
+                SupportAnimator animator =
                         ViewAnimationUtils.createCircularReveal(myView, cx, cy, 0, finalRadius);
-                animator.setInterpolator(new AccelerateInterpolator());
-                animator.setDuration(500);
-
-                if(Animator.LOLLIPOP){
-                    android.animation.Animator a = animator.getNativeAnimator();
-                }else{
-                    ObjectAnimator a = (ObjectAnimator)
-                            animator.getSupportAnimator();
-                    a.setAutoCancel(true);
-                }
-
+                animator.setInterpolator(new AccelerateDecelerateInterpolator());
+                animator.setDuration(1500);
                 animator.start();
             }
         });
 
+    }
+
+    static float hypo(int a, int b){
+        return (float) Math.sqrt(Math.pow(a, 2) + Math.pow(b, 2));
     }
 
     @Override
@@ -252,7 +248,6 @@ public class MainActivity extends ActionBarActivity{
         public void hide(final View target, float distance){
             ObjectAnimator animator = ObjectAnimator.ofFloat(target, "translationY",
                     ViewHelper.getTranslationY(target), distance);
-            animator.setAutoCancel(true);
             animator.setInterpolator(DECELERATE);
             animator.start();
         }
@@ -260,7 +255,6 @@ public class MainActivity extends ActionBarActivity{
         public void show(final View target){
             ObjectAnimator animator = ObjectAnimator.ofFloat(target, "translationY",
                     ViewHelper.getTranslationY(target), 0f);
-            animator.setAutoCancel(true);
             animator.setInterpolator(ACCELERATE);
             animator.start();
         }

@@ -1,6 +1,8 @@
 package io.codetail.animation;
 
+import android.annotation.TargetApi;
 import android.graphics.Rect;
+import android.os.Build;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 
@@ -9,7 +11,12 @@ import com.nineoldandroids.animation.ObjectAnimator;
 import com.nineoldandroids.view.ViewHelper;
 import com.nineoldandroids.view.ViewPropertyAnimator;
 
+import static android.os.Build.VERSION.SDK_INT;
+import static android.os.Build.VERSION_CODES.LOLLIPOP;
+
 public class ViewAnimationUtils {
+
+    private final static boolean LOLLIPOP_PLUS = SDK_INT >= LOLLIPOP;
 
     public static final int SCALE_UP_DURATION = 500;
 
@@ -31,12 +38,13 @@ public class ViewAnimationUtils {
      * @param startRadius The starting radius of the animating circle.
      * @param endRadius The ending radius of the animating circle.
      */
-    public static io.codetail.animation.Animator createCircularReveal(View view,
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    public static SupportAnimator createCircularReveal(View view,
                                                 int centerX,  int centerY,
                                                 float startRadius, float endRadius) {
 
-        if(io.codetail.animation.Animator.LOLLIPOP){
-            return new io.codetail.animation.Animator(android.view.ViewAnimationUtils
+        if(LOLLIPOP_PLUS){
+            return new SupportAnimatorLollipop(android.view.ViewAnimationUtils
                     .createCircularReveal(view, centerX, centerY, startRadius, endRadius));
         }
 
@@ -52,10 +60,22 @@ public class ViewAnimationUtils {
         view.getHitRect(bounds);
 
         ObjectAnimator reveal = ObjectAnimator.ofFloat(revealLayout, "revealRadius", startRadius, endRadius);
-        reveal.addListener(new RevealAnimator.RevealFinished(revealLayout, bounds));
+        reveal.addListener(getRevealFinishListener(revealLayout, bounds));
 
-        return new io.codetail.animation.Animator(reveal);
+        return new SupportAnimatorPreL(reveal);
     }
+
+
+    static Animator.AnimatorListener getRevealFinishListener(RevealAnimator target, Rect bounds){
+        if(SDK_INT >= 17){
+            return new RevealAnimator.RevealFinishedJellyBeanMr1(target, bounds);
+        }else if(SDK_INT >= 14){
+            return new RevealAnimator.RevealFinishedIceCreamSandwich(target, bounds);
+        }else {
+            return new RevealAnimator.RevealFinishedGingerbread(target, bounds);
+        }
+    }
+
 
     /**
      * Lifting view

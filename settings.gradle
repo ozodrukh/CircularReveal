@@ -1,1 +1,1 @@
-include ':app', ':circualreveal', ':graphics'
+include ':app', ':circualreveal'

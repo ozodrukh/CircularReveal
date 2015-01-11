@@ -10,17 +10,15 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
+import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
 import android.view.View;
 
-import dreamers.graphics.RippleDrawable;
-import dreamers.graphics.TouchTracker;
 import io.codetail.circualrevealsample.R;
 
 
 public class FloatingActionButton extends View{
 
-    RippleDrawable mRippleDrawable;
     Drawable mActionIcon;
     final int mActionSize;
 
@@ -41,10 +39,7 @@ public class FloatingActionButton extends View{
         super(context, attrs, defStyle);
         setFocusable(true);
         setClickable(true);
-
-        if(Build.VERSION.SDK_INT > 14 && Build.VERSION.SDK_INT < 16){
-            setLayerType(LAYER_TYPE_SOFTWARE, null);
-        }
+        ViewCompat.setLayerType(this, ViewCompat.LAYER_TYPE_SOFTWARE, null);
 
         Resources r = context.getResources();
 
@@ -70,25 +65,16 @@ public class FloatingActionButton extends View{
         mCirclePath = new Path();
 
         ViewUtils.setBackground(this, r.getDrawable(R.drawable.floatingactionbutton_shadow_layer));
-
-        mRippleDrawable = new RippleDrawable(r.getColorStateList(R.color.overlay_color), null);
-        mRippleDrawable.setVisible(true, false);
-        mRippleDrawable.setCallback(this);
-        mRippleDrawable.setState(getDrawableState());
-
-        setOnTouchListener(new TouchTracker(mRippleDrawable));
     }
 
     @Override
     protected boolean verifyDrawable(Drawable who) {
-        return who == mRippleDrawable || who == mActionIcon || super.verifyDrawable(who);
+        return who == mActionIcon || super.verifyDrawable(who);
     }
 
     @Override
     protected void drawableStateChanged() {
         super.drawableStateChanged();
-
-        mRippleDrawable.setState(getDrawableState());
 
         if(mActionIcon != null && mActionIcon.isStateful()){
             mActionIcon.setState(getDrawableState());
@@ -99,9 +85,6 @@ public class FloatingActionButton extends View{
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     public void jumpDrawablesToCurrentState() {
         super.jumpDrawablesToCurrentState();
-
-        mRippleDrawable.jumpToCurrentState();
-
         if(mActionIcon != null){
             mActionIcon.jumpToCurrentState();
         }
@@ -115,9 +98,6 @@ public class FloatingActionButton extends View{
 
         mCircle.radius = size / 2;
         mCircle.x = mCircle.y = mInnerCircleOffset + mCircle.radius;
-
-        mRippleDrawable.setBounds(mInnerCircleOffset, mInnerCircleOffset,
-                mInnerCircleOffset + size, mInnerCircleOffset + size);
 
         mCirclePath.reset();
         mCirclePath.addCircle(mCircle.x, mCircle.y, mCircle.radius, Path.Direction.CW);
@@ -138,8 +118,6 @@ public class FloatingActionButton extends View{
         canvas.clipPath(mCirclePath);
         canvas.drawPath(mCirclePath, mCirclePaint);
 
-        mRippleDrawable.draw(canvas);
-
         if(mActionIcon != null){
             final int beforeActionState = canvas.save();
 
@@ -155,7 +133,6 @@ public class FloatingActionButton extends View{
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
-        mRippleDrawable.setVisible(ViewUtils.isVisible(this), false);
 
         if(mActionIcon != null){
             mActionIcon.setVisible(ViewUtils.isVisible(this), false);
@@ -165,7 +142,6 @@ public class FloatingActionButton extends View{
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
-        mRippleDrawable.setVisible(false, false);
 
         if(mActionIcon != null){
             mActionIcon.setVisible(false, false);
