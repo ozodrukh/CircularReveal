@@ -52,6 +52,15 @@ public abstract class SupportAnimator {
 
 
     /**
+     * Adds a listener to the set of listeners that are sent events through the life of an
+     * animation, such as start, repeat, and end.
+     *
+     * @param listener the listener to be added to the current set of listeners for this animation.
+     */
+    public abstract void addListener(AnimatorListener listener);
+
+
+    /**
      * Returns whether this Animator is currently running (having been started and gone past any
      * initial startDelay period and not yet ended).
      *
@@ -59,5 +68,34 @@ public abstract class SupportAnimator {
      */
     public abstract boolean isRunning();
 
+
+    /**
+     * <p>An animation listener receives notifications from an animation.
+     * Notifications indicate animation related events, such as the end or the
+     * repetition of the animation.</p>
+     */
+    public static interface AnimatorListener {
+        /**
+         * <p>Notifies the start of the animation.</p>
+         */
+        void onAnimationStart();
+
+        /**
+         * <p>Notifies the end of the animation. This callback is not invoked
+         * for animations with repeat count set to INFINITE.</p>
+         */
+        void onAnimationEnd();
+
+        /**
+         * <p>Notifies the cancellation of the animation. This callback is not invoked
+         * for animations with repeat count set to INFINITE.</p>
+         */
+        void onAnimationCancel();
+
+        /**
+         * <p>Notifies the repetition of the animation.</p>
+         */
+        void onAnimationRepeat();
+    }
 
 }

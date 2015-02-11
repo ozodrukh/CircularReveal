@@ -15,6 +15,7 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.Interpolator;
+import android.widget.Toast;
 
 import com.nineoldandroids.animation.ObjectAnimator;
 import com.nineoldandroids.view.ViewHelper;
@@ -78,7 +79,7 @@ public class MainActivity extends ActionBarActivity{
             @Override
             public void onClick(View v) {
 
-                View myView = ((RevealFrameLayout) mCardsGroup.getChildAt(0)).getChildAt(0);
+                final View myView = ((RevealFrameLayout) mCardsGroup.getChildAt(0)).getChildAt(0);
 
                 // get the center for the clipping circle
                 //int cx = (myView.getLeft() + myView.getRight()) / 2;
@@ -91,6 +92,27 @@ public class MainActivity extends ActionBarActivity{
 
                 SupportAnimator animator =
                         ViewAnimationUtils.createCircularReveal(myView, cx, cy, 0, finalRadius);
+                animator.addListener(new SupportAnimator.AnimatorListener() {
+                    @Override
+                    public void onAnimationStart() {
+                    }
+
+                    @Override
+                    public void onAnimationEnd() {
+                        Toast.makeText(getApplicationContext(), "Done", Toast.LENGTH_LONG)
+                                .show();
+                    }
+
+                    @Override
+                    public void onAnimationCancel() {
+
+                    }
+
+                    @Override
+                    public void onAnimationRepeat() {
+
+                    }
+                });
                 animator.setInterpolator(new AccelerateDecelerateInterpolator());
                 animator.setDuration(1500);
                 animator.start();
