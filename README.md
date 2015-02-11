@@ -69,6 +69,29 @@ Use regular `RevealFrameLayout` & `RevealLinearLayout` don't worry, only target 
 
 ```
 
+How to add dependency
+=====================
+
+This library is not released in Maven Central, but instead you can use [JitPak](https://www.jitpack.io/)
+
+add remote maven url
+
+```groovy
+	repositories {
+	    maven {
+	        url "https://jitpack.io"
+	    }
+	}
+```
+
+then add a library dependency
+
+```groovy
+	dependencies {
+	    compile 'com.github.ozodrukh:CircularReveal:(latest-release)'
+	}
+```
+
 License
 --------
 
