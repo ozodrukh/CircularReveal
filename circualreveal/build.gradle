@@ -14,5 +14,3 @@ android {
 dependencies {
     compile 'com.nineoldandroids:library:2.4.0'
 }
-
-apply from: 'https://raw.githubusercontent.com/shamanland/gradle-mvn-push/cc18d56549cdea03f744b6fff27911569394073e/gradle-mvn-push.gradle'
