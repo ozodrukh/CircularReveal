@@ -29,7 +29,7 @@ Use regular `RevealFrameLayout` & `RevealLinearLayout` don't worry, only target 
     android:layout_width="match_parent"
     android:layout_height="match_parent">
     
-    <!-- Put more views here if you want, it's stock frame layout from Lollipop :)   -->
+    <!-- Put more views here if you want, it's stock frame layout  -->
 
     <android.support.v7.widget.CardView
         xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -88,9 +88,10 @@ then add a library dependency
 
 ```groovy
 	dependencies {
-	    compile 'com.github.ozodrukh:CircularReveal:(latest-release)@aar'
+	    compile 'com.github.ozodrukh:CircularReveal:1.0.6@aar'
 	}
 ```
+
 
 License
 --------
@@ -116,4 +117,3 @@ License
     LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
     THE SOFTWARE.
-I
