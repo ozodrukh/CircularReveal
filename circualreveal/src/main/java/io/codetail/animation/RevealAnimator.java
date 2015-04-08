@@ -94,14 +94,14 @@ public interface RevealAnimator{
         }
     }
 
-    static class RevealFinishedJellyBeanMr1 extends SimpleAnimationListener {
+    static class RevealFinishedJellyBeanMr2 extends SimpleAnimationListener {
         WeakReference<RevealAnimator> mReference;
         volatile Rect mInvalidateBounds;
 
         int mLayerType;
 
         @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-        RevealFinishedJellyBeanMr1(RevealAnimator target, Rect bounds) {
+        RevealFinishedJellyBeanMr2(RevealAnimator target, Rect bounds) {
             mReference = new WeakReference<>(target);
             mInvalidateBounds = bounds;
 

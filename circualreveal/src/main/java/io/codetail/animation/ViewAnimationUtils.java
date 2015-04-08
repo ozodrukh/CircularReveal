@@ -67,8 +67,8 @@ public class ViewAnimationUtils {
 
 
     static Animator.AnimatorListener getRevealFinishListener(RevealAnimator target, Rect bounds){
-        if(SDK_INT >= 17){
-            return new RevealAnimator.RevealFinishedJellyBeanMr1(target, bounds);
+        if(SDK_INT >= 18){
+            return new RevealAnimator.RevealFinishedJellyBeanMr2(target, bounds);
         }else if(SDK_INT >= 14){
             return new RevealAnimator.RevealFinishedIceCreamSandwich(target, bounds);
         }else {
