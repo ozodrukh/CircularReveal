@@ -111,20 +111,23 @@ public class RevealLinearLayout extends LinearLayout implements RevealAnimator{
 
     @Override
     protected boolean drawChild(Canvas canvas, View child, long drawingTime) {
-        if (!mClipOutlines && child != mTarget)
+        if(!mClipOutlines){
             return super.drawChild(canvas, child, drawingTime);
+        } else if(mTarget == child) {
+            final int state = canvas.save();
 
-        final int state = canvas.save();
+            mRevealPath.reset();
+            mRevealPath.addCircle(mCenterX, mCenterY, mRadius, Path.Direction.CW);
 
-        mRevealPath.reset();
-        mRevealPath.addCircle(mCenterX, mCenterY, mRadius, Path.Direction.CW);
+            canvas.clipPath(mRevealPath);
 
-        canvas.clipPath(mRevealPath);
+            boolean isInvalided = super.drawChild(canvas, child, drawingTime);
 
-        boolean isInvalided = super.drawChild(canvas, child, drawingTime);
+            canvas.restoreToCount(state);
 
-        canvas.restoreToCount(state);
-
-        return isInvalided;
+            return isInvalided;
+        }else{
+            return super.drawChild(canvas, child, drawingTime);
+        }
     }
 }
