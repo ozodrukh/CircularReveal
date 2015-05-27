@@ -13,6 +13,7 @@ import com.nineoldandroids.view.ViewPropertyAnimator;
 
 import static android.os.Build.VERSION.SDK_INT;
 import static android.os.Build.VERSION_CODES.LOLLIPOP;
+import static io.codetail.animation.RevealAnimator.CLIP_RADIUS;
 
 public class ViewAnimationUtils {
 
@@ -43,26 +44,26 @@ public class ViewAnimationUtils {
                                                 int centerX,  int centerY,
                                                 float startRadius, float endRadius) {
 
-        if(LOLLIPOP_PLUS){
-            return new SupportAnimatorLollipop(android.view.ViewAnimationUtils
-                    .createCircularReveal(view, centerX, centerY, startRadius, endRadius));
-        }
-
         if(!(view.getParent() instanceof RevealAnimator)){
             throw new IllegalArgumentException("View must be inside RevealFrameLayout or RevealLinearLayout.");
         }
 
         RevealAnimator revealLayout = (RevealAnimator) view.getParent();
         revealLayout.setTarget(view);
+        revealLayout.setClipOutlines(true);
         revealLayout.setCenter(centerX, centerY);
+        revealLayout.setRadius(startRadius, endRadius);
 
-        Rect bounds = new Rect();
-        view.getHitRect(bounds);
+        if(LOLLIPOP_PLUS){
+            return new SupportAnimatorLollipop(android.view.ViewAnimationUtils
+                    .createCircularReveal(view, centerX, centerY, startRadius, endRadius), revealLayout);
+        }
 
-        ObjectAnimator reveal = ObjectAnimator.ofFloat(revealLayout, "revealRadius", startRadius, endRadius);
-        reveal.addListener(getRevealFinishListener(revealLayout, bounds));
+        ObjectAnimator reveal = ObjectAnimator.ofFloat(revealLayout, CLIP_RADIUS,
+                startRadius, endRadius);
+        reveal.addListener(getRevealFinishListener(revealLayout, revealLayout.getTargetBounds()));
 
-        return new SupportAnimatorPreL(reveal);
+        return new SupportAnimatorPreL(reveal, revealLayout);
     }
 
 
@@ -145,7 +146,7 @@ public class ViewAnimationUtils {
 
     }
 
-    public static class SimpleAnimationListener implements Animator.AnimatorListener{
+    static class SimpleAnimationListener implements Animator.AnimatorListener{
 
         @Override
         public void onAnimationStart(Animator animation) {

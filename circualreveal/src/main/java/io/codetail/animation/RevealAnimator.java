@@ -6,6 +6,7 @@ import android.os.Build;
 import android.view.View;
 
 import com.nineoldandroids.animation.Animator;
+import com.nineoldandroids.util.FloatProperty;
 
 import java.lang.ref.WeakReference;
 
@@ -16,19 +17,80 @@ import static io.codetail.animation.ViewAnimationUtils.SimpleAnimationListener;
  */
 public interface RevealAnimator{
 
-    public void setClipOutlines(boolean clip);
+    RevealRadius CLIP_RADIUS = new RevealRadius();
 
-    public void setCenter(float cx, float cy);
+    /**
+     * Whether enable {@link android.graphics.Canvas} to clip
+     * outlines of the certain or not
+     *
+     * @param clip Whether clip outlines or not
+     *
+     * @see #setCenter(int, int)
+     * @see #setRevealRadius(float)
+     * @see #setTarget(View)
+     */
+    void setClipOutlines(boolean clip);
 
-    public void setTarget(View target);
+    /**
+     * Sets central points where to start clipping
+     * certain child
+     *
+     * @param cx x point of child
+     * @param cy y point of child
+     *
+     * @see #setClipOutlines(boolean) (float, float)
+     * @see #setRevealRadius(float)
+     * @see #setTarget(View)
+     */
+    void setCenter(int cx, int cy);
 
-    public void setRevealRadius(float value);
+    /**
+     * Reference the target of reveal animation
+     *
+     * @param target View to clip outlines
+     */
+    void setTarget(View target);
 
-    public float getRevealRadius();
+    /**
+     * Used with animator to animate view clipping
+     *
+     * @param value clip radius
+     */
+    void setRevealRadius(float value);
 
-    public void invalidate(Rect bounds);
+    /**
+     * Used with animator to animate view clipping
+     *
+     * @return current radius
+     */
+    float getRevealRadius();
 
-    static class RevealFinishedGingerbread extends SimpleAnimationListener {
+    /**
+     * Invalidate certain rectangle
+     *
+     * @param bounds bounds to redraw
+     */
+    void invalidate(Rect bounds);
+
+    /**
+     * Sets start values necessary for
+     * {@link SupportAnimator#reverse()}
+     */
+    void setupStartValues();
+
+    /**
+     * Keep this value for reverse animation
+     *
+     * @param start The start value of clip radius
+     * @param end The end value
+     */
+    void setRadius(float start, float end);
+
+    Rect getTargetBounds();
+
+    SupportAnimator startReverseAnimation();
+
+    class RevealFinishedGingerbread extends SimpleAnimationListener {
         WeakReference<RevealAnimator> mReference;
         volatile Rect mInvalidateBounds;
 
@@ -39,98 +101,65 @@ public interface RevealAnimator{
 
         @Override
         public void onAnimationEnd(Animator animation) {
-            super.onAnimationEnd(animation);
-
             RevealAnimator target = mReference.get();
-
-            if(target == null){
-                return;
-            }
-
-            target.setClipOutlines(false);
-            target.setCenter(0, 0);
-            target.setTarget(null);
+            target.setupStartValues();
             target.invalidate(mInvalidateBounds);
         }
     }
 
-    static class RevealFinishedIceCreamSandwich extends SimpleAnimationListener {
-        WeakReference<RevealAnimator> mReference;
-        volatile Rect mInvalidateBounds;
-
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    class RevealFinishedIceCreamSandwich extends RevealFinishedGingerbread {
+        int mFeaturedLayerType;
         int mLayerType;
 
-        @TargetApi(Build.VERSION_CODES.HONEYCOMB)
         RevealFinishedIceCreamSandwich(RevealAnimator target, Rect bounds) {
-            mReference = new WeakReference<>(target);
-            mInvalidateBounds = bounds;
+            super(target, bounds);
 
             mLayerType = ((View) target).getLayerType();
+            mFeaturedLayerType = View.LAYER_TYPE_SOFTWARE;
         }
 
         @Override
-        @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+        public void onAnimationCancel(Animator animation) {
+            onAnimationEnd(animation);
+        }
+
+        @Override
         public void onAnimationStart(Animator animation) {
-            super.onAnimationStart(animation);
-            ((View) mReference.get()).setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+            ((View) mReference.get()).setLayerType(mFeaturedLayerType, null);
         }
 
         @Override
-        @TargetApi(Build.VERSION_CODES.HONEYCOMB)
         public void onAnimationEnd(Animator animation) {
-            super.onAnimationEnd(animation);
             ((View) mReference.get()).setLayerType(mLayerType, null);
-
-            RevealAnimator target = mReference.get();
-
-            if(target == null){
-                return;
-            }
-
-            target.setClipOutlines(false);
-            target.setCenter(0, 0);
-            target.setTarget(null);
-            target.invalidate(mInvalidateBounds);
+            super.onAnimationEnd(animation);
         }
     }
 
-    static class RevealFinishedJellyBeanMr2 extends SimpleAnimationListener {
-        WeakReference<RevealAnimator> mReference;
-        volatile Rect mInvalidateBounds;
-
-        int mLayerType;
+    class RevealFinishedJellyBeanMr2 extends RevealFinishedIceCreamSandwich {
 
         @TargetApi(Build.VERSION_CODES.HONEYCOMB)
         RevealFinishedJellyBeanMr2(RevealAnimator target, Rect bounds) {
-            mReference = new WeakReference<>(target);
-            mInvalidateBounds = bounds;
+            super(target, bounds);
 
-            mLayerType = ((View) target).getLayerType();
+            mFeaturedLayerType = View.LAYER_TYPE_HARDWARE;
+        }
+    }
+
+    class RevealRadius extends FloatProperty<RevealAnimator> {
+
+        public RevealRadius() {
+            super("revealRadius");
         }
 
         @Override
-        @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-        public void onAnimationStart(Animator animation) {
-            super.onAnimationStart(animation);
-            ((View) mReference.get()).setLayerType(View.LAYER_TYPE_HARDWARE, null);
+        public void setValue(RevealAnimator object, float value) {
+            object.setRevealRadius(value);
         }
 
         @Override
-        @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-        public void onAnimationEnd(Animator animation) {
-            super.onAnimationEnd(animation);
-            ((View) mReference.get()).setLayerType(mLayerType, null);
-
-            RevealAnimator target = mReference.get();
-
-            if(target == null){
-                return;
-            }
-
-            target.setClipOutlines(false);
-            target.setCenter(0, 0);
-            target.setTarget(null);
-            target.invalidate(mInvalidateBounds);
+        public Float get(RevealAnimator object) {
+            return object.getRevealRadius();
         }
     }
 }

@@ -2,7 +2,15 @@ package io.codetail.animation;
 
 import android.view.animation.Interpolator;
 
+import java.lang.ref.WeakReference;
+
 public abstract class SupportAnimator {
+
+    WeakReference<RevealAnimator> mTarget;
+
+    public SupportAnimator(RevealAnimator target) {
+        mTarget = new WeakReference<>(target);
+    }
 
     /**
      * @return true if using native android animation framework, otherwise is
@@ -70,11 +78,73 @@ public abstract class SupportAnimator {
 
 
     /**
+     * Cancels the animation. Unlike {@link #end()}, <code>cancel()</code> causes the animation to
+     * stop in its tracks, sending an
+     * {@link AnimatorListener#onAnimationCancel()} to
+     * its listeners, followed by an
+     * {@link AnimatorListener#onAnimationEnd()} message.
+     *
+     * <p>This method must be called on the thread that is running the animation.</p>
+     */
+    public abstract void cancel();
+
+    /**
+     * Ends the animation. This causes the animation to assign the end value of the property being
+     * animated, then calling the
+     * {@link AnimatorListener#onAnimationEnd()} method on
+     * its listeners.
+     *
+     * <p>This method must be called on the thread that is running the animation.</p>
+     */
+    public void end() {
+    }
+
+    /**
+     * This method tells the object to use appropriate information to extract
+     * starting values for the animation. For example, a AnimatorSet object will pass
+     * this call to its child objects to tell them to set up the values. A
+     * ObjectAnimator object will use the information it has about its target object
+     * and PropertyValuesHolder objects to get the start values for its properties.
+     * A ValueAnimator object will ignore the request since it does not have enough
+     * information (such as a target object) to gather these values.
+     */
+    public void setupStartValues() {
+    }
+
+    /**
+     * This method tells the object to use appropriate information to extract
+     * ending values for the animation. For example, a AnimatorSet object will pass
+     * this call to its child objects to tell them to set up the values. A
+     * ObjectAnimator object will use the information it has about its target object
+     * and PropertyValuesHolder objects to get the start values for its properties.
+     * A ValueAnimator object will ignore the request since it does not have enough
+     * information (such as a target object) to gather these values.
+     */
+    public void setupEndValues() {
+    }
+
+    /**
+     * Experimental feature
+     */
+    public SupportAnimator reverse() {
+        if(isRunning()){
+            return null;
+        }
+
+        RevealAnimator target = mTarget.get();
+        if(target != null){
+            return target.startReverseAnimation();
+        }
+
+        return null;
+    }
+
+    /**
      * <p>An animation listener receives notifications from an animation.
      * Notifications indicate animation related events, such as the end or the
      * repetition of the animation.</p>
      */
-    public static interface AnimatorListener {
+    public interface AnimatorListener {
         /**
          * <p>Notifies the start of the animation.</p>
          */

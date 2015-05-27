@@ -10,10 +10,11 @@ import java.lang.ref.WeakReference;
 @TargetApi(Build.VERSION_CODES.HONEYCOMB)
 final class SupportAnimatorLollipop extends SupportAnimator{
 
-    WeakReference<Animator> mNativeAnimator;
+    WeakReference<Animator> mAnimator;
 
-    SupportAnimatorLollipop(Animator animator) {
-        mNativeAnimator = new WeakReference<Animator>(animator);
+    SupportAnimatorLollipop(Animator animator, RevealAnimator target) {
+        super(target);
+        mAnimator = new WeakReference<>(animator);
     }
 
     @Override
@@ -23,13 +24,13 @@ final class SupportAnimatorLollipop extends SupportAnimator{
 
     @Override
     public Object get() {
-        return mNativeAnimator.get();
+        return mAnimator.get();
     }
 
 
     @Override
     public void start() {
-        Animator a = mNativeAnimator.get();
+        Animator a = mAnimator.get();
         if(a != null) {
             a.start();
         }
@@ -37,7 +38,7 @@ final class SupportAnimatorLollipop extends SupportAnimator{
 
     @Override
     public void setDuration(int duration) {
-        Animator a = mNativeAnimator.get();
+        Animator a = mAnimator.get();
         if(a != null) {
             a.setDuration(duration);
         }
@@ -45,7 +46,7 @@ final class SupportAnimatorLollipop extends SupportAnimator{
 
     @Override
     public void setInterpolator(Interpolator value) {
-        Animator a = mNativeAnimator.get();
+        Animator a = mAnimator.get();
         if(a != null) {
             a.setInterpolator(value);
         }
@@ -53,7 +54,7 @@ final class SupportAnimatorLollipop extends SupportAnimator{
 
     @Override
     public void addListener(final AnimatorListener listener) {
-        Animator a = mNativeAnimator.get();
+        Animator a = mAnimator.get();
         if(a == null) {
             return;
         }
@@ -88,7 +89,39 @@ final class SupportAnimatorLollipop extends SupportAnimator{
 
     @Override
     public boolean isRunning() {
-        Animator a = mNativeAnimator.get();
+        Animator a = mAnimator.get();
         return a != null && a.isRunning();
+    }
+
+    @Override
+    public void cancel() {
+        Animator a = mAnimator.get();
+        if(a != null){
+            a.cancel();
+        }
+    }
+
+    @Override
+    public void end() {
+        Animator a = mAnimator.get();
+        if(a != null){
+            a.end();
+        }
+    }
+
+    @Override
+    public void setupStartValues() {
+        Animator a = mAnimator.get();
+        if(a != null){
+            a.setupStartValues();
+        }
+    }
+
+    @Override
+    public void setupEndValues() {
+        Animator a = mAnimator.get();
+        if(a != null){
+            a.setupEndValues();
+        }
     }
 }

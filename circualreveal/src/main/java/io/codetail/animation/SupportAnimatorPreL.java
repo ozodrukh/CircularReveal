@@ -8,10 +8,11 @@ import java.lang.ref.WeakReference;
 
 final class SupportAnimatorPreL extends SupportAnimator {
 
-    WeakReference<Animator> mSupportFramework;
+    WeakReference<Animator> mAnimator;
 
-    SupportAnimatorPreL(Animator animator) {
-        mSupportFramework = new WeakReference<Animator>(animator);
+    SupportAnimatorPreL(Animator animator, RevealAnimator target) {
+        super(target);
+        mAnimator = new WeakReference<>(animator);
     }
 
     @Override
@@ -21,12 +22,12 @@ final class SupportAnimatorPreL extends SupportAnimator {
 
     @Override
     public Object get() {
-        return mSupportFramework.get();
+        return mAnimator.get();
     }
 
     @Override
     public void start() {
-        Animator a = mSupportFramework.get();
+        Animator a = mAnimator.get();
         if(a != null) {
             a.start();
         }
@@ -34,7 +35,7 @@ final class SupportAnimatorPreL extends SupportAnimator {
 
     @Override
     public void setDuration(int duration) {
-        Animator a = mSupportFramework.get();
+        Animator a = mAnimator.get();
         if(a != null) {
             a.setDuration(duration);
         }
@@ -42,7 +43,7 @@ final class SupportAnimatorPreL extends SupportAnimator {
 
     @Override
     public void setInterpolator(Interpolator value) {
-        Animator a = mSupportFramework.get();
+        Animator a = mAnimator.get();
         if(a != null) {
             a.setInterpolator(value);
         }
@@ -50,7 +51,7 @@ final class SupportAnimatorPreL extends SupportAnimator {
 
     @Override
     public void addListener(final AnimatorListener listener) {
-        Animator a = mSupportFramework.get();
+        Animator a = mAnimator.get();
         if(a == null) {
             return;
         }
@@ -85,7 +86,39 @@ final class SupportAnimatorPreL extends SupportAnimator {
 
     @Override
     public boolean isRunning() {
-        Animator a = mSupportFramework.get();
+        Animator a = mAnimator.get();
         return a != null && a.isRunning();
+    }
+
+    @Override
+    public void cancel() {
+        Animator a = mAnimator.get();
+        if(a != null){
+            a.cancel();
+        }
+    }
+
+    @Override
+    public void end() {
+        Animator a = mAnimator.get();
+        if(a != null){
+            a.end();
+        }
+    }
+
+    @Override
+    public void setupStartValues() {
+        Animator a = mAnimator.get();
+        if(a != null){
+            a.setupStartValues();
+        }
+    }
+
+    @Override
+    public void setupEndValues() {
+        Animator a = mAnimator.get();
+        if(a != null){
+            a.setupEndValues();
+        }
     }
 }
