@@ -88,7 +88,7 @@ then add a library dependency
 
 ```groovy
 	dependencies {
-	    compile 'com.github.ozodrukh:CircularReveal:1.0.5@aar'
+	    compile 'com.github.ozodrukh:CircularReveal:1.0.6@aar'
 	}
 ```
 
