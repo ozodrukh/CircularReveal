@@ -44,6 +44,8 @@ public class MainActivity extends ActionBarActivity{
     LinearLayoutManager mLayoutManager;
     RecycleAdapter mCardsAdapter;
 
+    private SupportAnimator mAnimator;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -79,43 +81,71 @@ public class MainActivity extends ActionBarActivity{
             @Override
             public void onClick(View v) {
 
-                final View myView = ((RevealFrameLayout) mCardsGroup.getChildAt(0)).getChildAt(0);
+                if(mAnimator != null && !mAnimator.isRunning()){
+                    mAnimator = mAnimator.reverse();
+                    mAnimator.addListener(new SupportAnimator.AnimatorListener() {
+                        @Override
+                        public void onAnimationStart() {
 
-                // get the center for the clipping circle
-                //int cx = (myView.getLeft() + myView.getRight()) / 2;
-                //int cy = (myView.getTop() + myView.getBottom()) / 2;
-                int cx = myView.getRight();
-                int cy = myView.getBottom();
+                        }
 
-                // get the final radius for the clipping circle
-                float finalRadius = hypo(myView.getWidth(), myView.getHeight());
+                        @Override
+                        public void onAnimationEnd() {
+                            mAnimator = null;
+                        }
 
-                SupportAnimator animator =
-                        ViewAnimationUtils.createCircularReveal(myView, cx, cy, 0, finalRadius);
-                animator.addListener(new SupportAnimator.AnimatorListener() {
-                    @Override
-                    public void onAnimationStart() {
-                    }
+                        @Override
+                        public void onAnimationCancel() {
 
-                    @Override
-                    public void onAnimationEnd() {
-                        Toast.makeText(getApplicationContext(), "Done", Toast.LENGTH_LONG)
-                                .show();
-                    }
+                        }
 
-                    @Override
-                    public void onAnimationCancel() {
+                        @Override
+                        public void onAnimationRepeat() {
 
-                    }
+                        }
+                    });
+                }else if(mAnimator != null){
+                    mAnimator.cancel();
+                    return;
+                }else {
 
-                    @Override
-                    public void onAnimationRepeat() {
+                    final View myView = ((RevealFrameLayout) mCardsGroup.getChildAt(0)).getChildAt(0);
 
-                    }
-                });
-                animator.setInterpolator(new AccelerateDecelerateInterpolator());
-                animator.setDuration(1500);
-                animator.start();
+                    // get the center for the clipping circle
+                    //int cx = (myView.getLeft() + myView.getRight()) / 2;
+                    //int cy = (myView.getTop() + myView.getBottom()) / 2;
+                    int cx = myView.getRight();
+                    int cy = myView.getBottom();
+
+                    // get the final radius for the clipping circle
+                    float finalRadius = hypo(myView.getWidth(), myView.getHeight());
+
+                    mAnimator = ViewAnimationUtils.createCircularReveal(myView, cx, cy, 0, finalRadius);
+                    mAnimator.addListener(new SupportAnimator.AnimatorListener() {
+                        @Override
+                        public void onAnimationStart() {
+                        }
+
+                        @Override
+                        public void onAnimationEnd() {
+                            Toast.makeText(getApplicationContext(), "Done", Toast.LENGTH_LONG).show();
+                        }
+
+                        @Override
+                        public void onAnimationCancel() {
+
+                        }
+
+                        @Override
+                        public void onAnimationRepeat() {
+
+                        }
+                    });
+                }
+
+                mAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
+                mAnimator.setDuration(1500);
+                mAnimator.start();
             }
         });
 
