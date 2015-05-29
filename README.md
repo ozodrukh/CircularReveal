@@ -69,6 +69,26 @@ Use regular `RevealFrameLayout` & `RevealLinearLayout` don't worry, only target 
 
 ```
 
+####API that need to mention 
+
+#####Cancel it! 
+
+```java
+
+   SupportAnimator animator = ... ;
+   animator.cancel();         
+
+```
+
+#####Reverse it!
+
+```java
+
+   SupportAnimator animator = ... ;
+   animator = animator.reverse(); // override with new one
+
+```
+
 How to add dependency
 =====================
 
@@ -88,7 +108,7 @@ then add a library dependency
 
 ```groovy
 	dependencies {
-	    compile 'com.github.ozodrukh:CircularReveal:1.0.6@aar'
+	    compile 'com.github.ozodrukh:CircularReveal:1.1.0@aar'
 	}
 ```
 
