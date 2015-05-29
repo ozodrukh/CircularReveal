@@ -15,19 +15,10 @@ import io.codetail.animation.ViewAnimationUtils;
 public class RevealFrameLayout extends FrameLayout implements RevealAnimator{
 
     private Path mRevealPath;
-
-    private boolean mClipOutlines;
-
-    private int mCenterX;
-    private int mCenterY;
-    private float mRadius;
-
-    private View mTarget;
-
-    private float mStartRadius;
-    private float mEndRadius;
-
     private final Rect mTargetBounds = new Rect();
+    private RevealInfo mRevealInfo;
+    private boolean mRunning;
+    private float mRadius;
 
     public RevealFrameLayout(Context context) {
         this(context, null);
@@ -42,36 +33,20 @@ public class RevealFrameLayout extends FrameLayout implements RevealAnimator{
         mRevealPath = new Path();
     }
 
-    /**
-     * Animation target
-     *
-     * @hide
-     */
     @Override
-    public void setTarget(View view){
-        mTarget = view;
-        view.getHitRect(mTargetBounds);
+    public void onRevealAnimationStart() {
+        mRunning = true;
     }
 
-    /**
-     * Epicenter of animation circle reveal
-     *
-     * @hide
-     */
     @Override
-    public void setCenter(int centerX, int centerY){
-        mCenterX = centerX;
-        mCenterY = centerY;
+    public void onRevealAnimationEnd() {
+        mRunning = false;
+        invalidate(mTargetBounds);
     }
 
-    /**
-     * Flag that animation is enabled
-     *
-     * @hide
-     */
     @Override
-    public void setClipOutlines(boolean clip){
-        mClipOutlines = clip;
+    public void onRevealAnimationCancel() {
+        onRevealAnimationEnd();
     }
 
     /**
@@ -95,38 +70,35 @@ public class RevealFrameLayout extends FrameLayout implements RevealAnimator{
         return mRadius;
     }
 
+    /**
+     * @hide
+     */
     @Override
-    public void setupStartValues() {
-        mClipOutlines = false;
-        mRadius = 0;
+    public void attachRevealInfo(RevealInfo info) {
+        info.getTarget().getHitRect(mTargetBounds);
+        mRevealInfo = info;
     }
 
-    @Override
-    public void setRadius(float start, float end) {
-        mStartRadius = start;
-        mEndRadius = end;
-    }
-
-    @Override
-    public Rect getTargetBounds() {
-        return mTargetBounds;
-    }
-
+    /**
+     * @hide
+     */
     @Override
     public SupportAnimator startReverseAnimation() {
-        return ViewAnimationUtils.createCircularReveal(mTarget, mCenterX, mCenterY,
-                mEndRadius, mStartRadius);
+        if(mRevealInfo != null && mRevealInfo.hasTarget() && !mRunning) {
+            return ViewAnimationUtils.createCircularReveal(mRevealInfo.getTarget(),
+                    mRevealInfo.centerX, mRevealInfo.centerY,
+                    mRevealInfo.endRadius, mRevealInfo.startRadius);
+        }
+        return null;
     }
 
     @Override
     protected boolean drawChild(Canvas canvas, View child, long drawingTime) {
-        if(!mClipOutlines){
-            return super.drawChild(canvas, child, drawingTime);
-        } else if(mTarget == child) {
+        if(mRunning && child == mRevealInfo.getTarget()){
             final int state = canvas.save();
 
             mRevealPath.reset();
-            mRevealPath.addCircle(mCenterX, mCenterY, mRadius, Path.Direction.CW);
+            mRevealPath.addCircle(mRevealInfo.centerX, mRevealInfo.centerY, mRadius, Path.Direction.CW);
 
             canvas.clipPath(mRevealPath);
 
@@ -135,9 +107,9 @@ public class RevealFrameLayout extends FrameLayout implements RevealAnimator{
             canvas.restoreToCount(state);
 
             return isInvalided;
-        }else{
-            return super.drawChild(canvas, child, drawingTime);
         }
+
+        return super.drawChild(canvas, child, drawingTime);
     }
 
 }

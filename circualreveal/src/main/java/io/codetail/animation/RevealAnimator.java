@@ -20,36 +20,12 @@ public interface RevealAnimator{
     RevealRadius CLIP_RADIUS = new RevealRadius();
 
     /**
-     * Whether enable {@link android.graphics.Canvas} to clip
-     * outlines of the certain or not
-     *
-     * @param clip Whether clip outlines or not
-     *
-     * @see #setCenter(int, int)
-     * @see #setRevealRadius(float)
-     * @see #setTarget(View)
+     * Listen when animation start/end/cancel
+     * and setup view for it
      */
-    void setClipOutlines(boolean clip);
-
-    /**
-     * Sets central points where to start clipping
-     * certain child
-     *
-     * @param cx x point of child
-     * @param cy y point of child
-     *
-     * @see #setClipOutlines(boolean) (float, float)
-     * @see #setRevealRadius(float)
-     * @see #setTarget(View)
-     */
-    void setCenter(int cx, int cy);
-
-    /**
-     * Reference the target of reveal animation
-     *
-     * @param target View to clip outlines
-     */
-    void setTarget(View target);
+    void onRevealAnimationStart();
+    void onRevealAnimationEnd();
+    void onRevealAnimationCancel();
 
     /**
      * Used with animator to animate view clipping
@@ -69,41 +45,83 @@ public interface RevealAnimator{
      * Invalidate certain rectangle
      *
      * @param bounds bounds to redraw
+     * @see View#invalidate(Rect)
      */
     void invalidate(Rect bounds);
 
     /**
-     * Sets start values necessary for
-     * {@link SupportAnimator#reverse()}
+     * {@link ViewAnimationUtils#createCircularReveal(View, int, int, float, float)} is
+     * called it creates new {@link io.codetail.animation.RevealAnimator.RevealInfo}
+     * and attaches to parent, here is necessary data about animation
+     *
+     * @param info reveal information
+     *
+     * @see RevealAnimator.RevealInfo
      */
-    void setupStartValues();
+    void attachRevealInfo(RevealInfo info);
 
     /**
-     * Keep this value for reverse animation
+     * Returns new {@link SupportAnimator} that plays
+     * reversed animation of current one
      *
-     * @param start The start value of clip radius
-     * @param end The end value
+     * This method might be temporary, you should call
+     * {@link SupportAnimator#reverse()} instead
+     *
+     * @hide
+     * @return reverse {@link SupportAnimator}
+     *
+     * @see SupportAnimator#reverse()
      */
-    void setRadius(float start, float end);
-
-    Rect getTargetBounds();
-
     SupportAnimator startReverseAnimation();
+
+    class RevealInfo{
+        public final int centerX;
+        public final int centerY;
+        public final float startRadius;
+        public final float endRadius;
+        public final WeakReference<View> target;
+
+        public RevealInfo(int centerX, int centerY, float startRadius, float endRadius,
+                          WeakReference<View> target) {
+            this.centerX = centerX;
+            this.centerY = centerY;
+            this.startRadius = startRadius;
+            this.endRadius = endRadius;
+            this.target = target;
+        }
+
+        public View getTarget(){
+            return target.get();
+        }
+
+        public boolean hasTarget(){
+            return getTarget() != null;
+        }
+    }
 
     class RevealFinishedGingerbread extends SimpleAnimationListener {
         WeakReference<RevealAnimator> mReference;
-        volatile Rect mInvalidateBounds;
 
-        RevealFinishedGingerbread(RevealAnimator target, Rect bounds) {
+        RevealFinishedGingerbread(RevealAnimator target) {
             mReference = new WeakReference<>(target);
-            mInvalidateBounds = bounds;
+        }
+
+        @Override
+        public void onAnimationStart(Animator animation) {
+            RevealAnimator target = mReference.get();
+            target.onRevealAnimationStart();
+        }
+
+        @Override
+        public void onAnimationCancel(Animator animation) {
+            RevealAnimator target = mReference.get();
+            target.onRevealAnimationCancel();
         }
 
         @Override
         public void onAnimationEnd(Animator animation) {
             RevealAnimator target = mReference.get();
-            target.setupStartValues();
-            target.invalidate(mInvalidateBounds);
+            target.onRevealAnimationEnd();
         }
     }
 
@@ -112,8 +130,8 @@ public interface RevealAnimator{
         int mFeaturedLayerType;
         int mLayerType;
 
-        RevealFinishedIceCreamSandwich(RevealAnimator target, Rect bounds) {
-            super(target, bounds);
+        RevealFinishedIceCreamSandwich(RevealAnimator target) {
+            super(target);
 
             mLayerType = ((View) target).getLayerType();
             mFeaturedLayerType = View.LAYER_TYPE_SOFTWARE;
@@ -121,12 +139,14 @@ public interface RevealAnimator{
 
         @Override
         public void onAnimationCancel(Animator animation) {
-            onAnimationEnd(animation);
+            ((View) mReference.get()).setLayerType(mLayerType, null);
+            super.onAnimationEnd(animation);
         }
 
         @Override
         public void onAnimationStart(Animator animation) {
             ((View) mReference.get()).setLayerType(mFeaturedLayerType, null);
+            super.onAnimationStart(animation);
         }
 
         @Override
@@ -139,8 +159,8 @@ public interface RevealAnimator{
     class RevealFinishedJellyBeanMr2 extends RevealFinishedIceCreamSandwich {
 
         @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-        RevealFinishedJellyBeanMr2(RevealAnimator target, Rect bounds) {
-            super(target, bounds);
+        RevealFinishedJellyBeanMr2(RevealAnimator target) {
+            super(target);
 
             mFeaturedLayerType = View.LAYER_TYPE_HARDWARE;
         }

@@ -1,7 +1,6 @@
 package io.codetail.animation;
 
 import android.annotation.TargetApi;
-import android.graphics.Rect;
 import android.os.Build;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
@@ -10,6 +9,10 @@ import com.nineoldandroids.animation.Animator;
 import com.nineoldandroids.animation.ObjectAnimator;
 import com.nineoldandroids.view.ViewHelper;
 import com.nineoldandroids.view.ViewPropertyAnimator;
+
+import java.lang.ref.WeakReference;
+
+import io.codetail.animation.RevealAnimator.RevealInfo;
 
 import static android.os.Build.VERSION.SDK_INT;
 import static android.os.Build.VERSION_CODES.LOLLIPOP;
@@ -49,10 +52,8 @@ public class ViewAnimationUtils {
         }
 
         RevealAnimator revealLayout = (RevealAnimator) view.getParent();
-        revealLayout.setTarget(view);
-        revealLayout.setClipOutlines(true);
-        revealLayout.setCenter(centerX, centerY);
-        revealLayout.setRadius(startRadius, endRadius);
+        revealLayout.attachRevealInfo(new RevealInfo(centerX, centerY, startRadius, endRadius,
+                new WeakReference<>(view)));
 
         if(LOLLIPOP_PLUS){
             return new SupportAnimatorLollipop(android.view.ViewAnimationUtils
@@ -61,22 +62,20 @@ public class ViewAnimationUtils {
 
         ObjectAnimator reveal = ObjectAnimator.ofFloat(revealLayout, CLIP_RADIUS,
                 startRadius, endRadius);
-        reveal.addListener(getRevealFinishListener(revealLayout, revealLayout.getTargetBounds()));
+        reveal.addListener(getRevealFinishListener(revealLayout));
 
         return new SupportAnimatorPreL(reveal, revealLayout);
     }
 
-
-    static Animator.AnimatorListener getRevealFinishListener(RevealAnimator target, Rect bounds){
+    private static Animator.AnimatorListener getRevealFinishListener(RevealAnimator target){
         if(SDK_INT >= 18){
-            return new RevealAnimator.RevealFinishedJellyBeanMr2(target, bounds);
+            return new RevealAnimator.RevealFinishedJellyBeanMr2(target);
         }else if(SDK_INT >= 14){
-            return new RevealAnimator.RevealFinishedIceCreamSandwich(target, bounds);
+            return new RevealAnimator.RevealFinishedIceCreamSandwich(target);
         }else {
-            return new RevealAnimator.RevealFinishedGingerbread(target, bounds);
+            return new RevealAnimator.RevealFinishedGingerbread(target);
         }
     }
-
 
     /**
      * Lifting view
@@ -87,6 +86,7 @@ public class ViewAnimationUtils {
      * @param duration aniamtion duration
      * @param startDelay start delay before animation begin
      */
+    @Deprecated
     public static void liftingFromBottom(View view, float baseRotation, float fromY, int duration, int startDelay){
         ViewHelper.setRotationX(view, baseRotation);
         ViewHelper.setTranslationY(view, fromY);
@@ -110,6 +110,7 @@ public class ViewAnimationUtils {
      * @param duration aniamtion duration
      * @param startDelay start delay before animation begin
      */
+    @Deprecated
     public static void liftingFromBottom(View view, float baseRotation, int duration, int startDelay){
         ViewHelper.setRotationX(view, baseRotation);
         ViewHelper.setTranslationY(view, view.getHeight() / 3);
@@ -132,6 +133,7 @@ public class ViewAnimationUtils {
      * @param baseRotation initial Rotation X in 3D space
      * @param duration aniamtion duration
      */
+    @Deprecated
     public static void liftingFromBottom(View view, float baseRotation, int duration){
         ViewHelper.setRotationX(view, baseRotation);
         ViewHelper.setTranslationY(view, view.getHeight() / 3);
