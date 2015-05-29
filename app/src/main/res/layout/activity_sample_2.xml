@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<io.codetail.widget.RevealFrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:padding="16dp"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <io.codetail.circualrevealsample.CardViewPlus
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/card1"
+        style="@style/CardView"
+        app:cardBackgroundColor="@color/material_deep_teal_500"
+        app:cardElevation="2dp"
+        app:cardPreventCornerOverlap="false"
+        app:cardUseCompatPadding="true"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center_horizontal"
+        />
+
+    <io.codetail.circualrevealsample.CardViewPlus
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/card2"
+        style="@style/CardView"
+        app:cardBackgroundColor="@color/material_deep_teal_500"
+        app:cardElevation="2dp"
+        app:cardPreventCornerOverlap="false"
+        app:cardUseCompatPadding="true"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center_horizontal"
+        />
+
+</io.codetail.widget.RevealFrameLayout>

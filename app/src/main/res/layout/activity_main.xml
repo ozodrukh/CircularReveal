@@ -16,14 +16,17 @@
         />
 
 
-    <io.codetail.circualrevealsample.widget.FloatingActionButton
+    <android.support.design.widget.FloatingActionButton
         android:id="@+id/floatingActionButton"
-        android:layout_width="74dp"
-        android:layout_height="74dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_gravity="right|bottom"
-        android:layout_marginBottom="@dimen/activity_vertical_margin"
-        app:actionColor="?attr/colorAccent"
-        app:actionIcon="@drawable/ic_refresh_white_24dp"
+        android:layout_margin="@dimen/activity_vertical_margin"
+        app:rippleColor="#efefef"
+        app:elevation="2dp"
+        app:pressedTranslationZ="4dp"
+        android:src="@drawable/ic_refresh_white_24dp"
+        android:scaleType="centerInside"
         />
 
 
@@ -33,6 +36,7 @@
         android:layout_height="wrap_content"
         android:background="?attr/colorPrimary"
         android:minHeight="?attr/actionBarSize"
+        android:elevation="2dp"
         />
 
 </io.codetail.circualrevealsample.widget.FrameLayoutCompat>
