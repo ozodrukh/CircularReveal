@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<io.codetail.widget.RevealFrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <io.codetail.circualrevealsample.CardViewPlus
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/content"
+        style="@style/CardView"
+        app:cardElevation="2dp"
+        app:cardPreventCornerOverlap="false"
+        app:cardUseCompatPadding="true"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center_horizontal">
+
+        <io.codetail.circualrevealsample.CardViewPlus
+            app:cardBackgroundColor="?colorPrimary"
+            android:layout_width="match_parent"
+            android:layout_height="112dp" />
+
+        <io.codetail.circualrevealsample.CardViewPlus
+            android:layout_width="300dp"
+            android:layout_height="200dp"
+            android:layout_marginTop="146dp"
+            android:layout_gravity="center_horizontal"
+            />
+
+        <io.codetail.circualrevealsample.CardViewPlus
+            android:layout_width="300dp"
+            android:layout_height="200dp"
+            android:layout_marginTop="354dp"
+            android:layout_gravity="center_horizontal"
+            />
+
+        <android.support.design.widget.FloatingActionButton
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_gravity="right"
+            android:layout_marginRight="16dp"
+            android:layout_marginTop="86dp"
+            />
+
+    </io.codetail.circualrevealsample.CardViewPlus>
+
+</io.codetail.widget.RevealFrameLayout>

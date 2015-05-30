@@ -324,12 +324,19 @@ public class MainActivity extends AppCompatActivity{
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        Intent intent = null;
+
         switch (item.getItemId()){
             case R.id.sampl2:
-                Intent intent = new Intent(this, Sample2Activity.class);
-                startActivity(intent);
-                return true;
+                intent = new Intent(this, Sample2Activity.class);
+                break;
+
+            case R.id.sampl3:
+                intent = new Intent(this, Sample3Activity.class);
+                break;
         }
-        return super.onOptionsItemSelected(item);
+
+        startActivity(intent);
+        return intent != null;
     }
 }

@@ -132,7 +132,7 @@ public class Sample2Activity extends AppCompatActivity
         SupportAnimator create(View view, Rect bounds);
     }
 
-    static float hypo(float a, float b){
+    public static float hypo(float a, float b){
         return (float) Math.sqrt( Math.pow(a, 2) + Math.pow(b, 2) );
     }
 

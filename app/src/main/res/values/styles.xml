@@ -5,8 +5,6 @@
         <attr name="actionColor" format="color" />
     </declare-styleable>
 
-
-
     <declare-styleable name="FrameLayoutCompat">
         <!-- Defines the drawable to draw over the content. This can be used as an overlay.
              The foreground drawable participates in the padding of the content if the gravity
