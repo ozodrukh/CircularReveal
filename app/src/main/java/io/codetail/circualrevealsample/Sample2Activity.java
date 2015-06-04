@@ -11,6 +11,7 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 
 import io.codetail.animation.SupportAnimator;
 import io.codetail.animation.ViewAnimationUtils;
+import io.codetail.animation.SupportAnimator.SimpleAnimatorListener;
 
 public class Sample2Activity extends AppCompatActivity
         implements ViewTreeObserver.OnGlobalLayoutListener{
@@ -93,29 +94,6 @@ public class Sample2Activity extends AppCompatActivity
         hsl[1] = (float) (40 + (Math.random() * 60));
         hsl[2] = (float) (40 + (Math.random() * 60));
         return ColorUtils.HSLToColor(hsl);
-    }
-
-    static class SimpleAnimatorListener implements SupportAnimator.AnimatorListener{
-
-        @Override
-        public void onAnimationStart() {
-
-        }
-
-        @Override
-        public void onAnimationEnd() {
-
-        }
-
-        @Override
-        public void onAnimationCancel() {
-
-        }
-
-        @Override
-        public void onAnimationRepeat() {
-
-        }
     }
 
     private int mCreationIndex;
