@@ -168,4 +168,30 @@ public abstract class SupportAnimator {
         void onAnimationRepeat();
     }
 
+    /**
+     * <p>Provides default implementation for AnimatorListener.</p>
+     */
+    public abstract class SimpleAnimatorListener implements AnimatorListener {
+
+        @Override
+        public void onAnimationStart() {
+
+        }
+
+        @Override
+        public void onAnimationEnd() {
+
+        }
+
+        @Override
+        public void onAnimationCancel() {
+
+        }
+
+        @Override
+        public void onAnimationRepeat() {
+
+        }
+    }
+
 }
