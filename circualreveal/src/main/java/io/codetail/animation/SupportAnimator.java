@@ -171,7 +171,7 @@ public abstract class SupportAnimator {
     /**
      * <p>Provides default implementation for AnimatorListener.</p>
      */
-    public abstract class SimpleAnimatorListener implements AnimatorListener {
+    public static abstract class SimpleAnimatorListener implements AnimatorListener {
 
         @Override
         public void onAnimationStart() {
