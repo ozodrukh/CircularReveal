@@ -57,6 +57,7 @@ public class RevealLinearLayout extends LinearLayout implements RevealAnimator{
     @Override
     public void setRevealRadius(float radius){
         mRadius = radius;
+        mRevealInfo.getTarget().getHitRect(mTargetBounds);
         invalidate(mTargetBounds);
     }
 
@@ -75,7 +76,6 @@ public class RevealLinearLayout extends LinearLayout implements RevealAnimator{
      */
     @Override
     public void attachRevealInfo(RevealInfo info) {
-        info.getTarget().getHitRect(mTargetBounds);
         mRevealInfo = info;
     }
 
