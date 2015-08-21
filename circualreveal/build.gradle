@@ -1,17 +1,124 @@
 apply plugin: 'com.android.library'
 apply plugin: 'android-maven'
+apply plugin: 'git-repo'
+apply plugin: 'maven-publish'
+
+archivesBaseName = 'android-circularreveal'
+version = '1.0.1'
 
 android {
     compileSdkVersion 22
     buildToolsVersion "22.0.1"
 
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
+    }
 
     defaultConfig {
         minSdkVersion 9
         targetSdkVersion 22
+
+        versionCode 7
+        versionName "${version}"
+
+        multiDexEnabled true
+    }
+
+    libraryVariants.all { variant ->
+        variant.outputs.each { output ->
+            def outputFile = output.outputFile
+
+            if (outputFile != null && outputFile.name.endsWith('.aar')) {
+                output.outputFile = new File(outputFile.parent, "${archivesBaseName}-${variant.buildType.name}.aar")
+            }
+        }
+    }
+
+    lintOptions {
+        abortOnError false
     }
 }
 
 dependencies {
     compile 'com.nineoldandroids:library:2.4.0'
+}
+
+gitPublishConfig {
+    org = 'WW-Digital'
+    repo = 'android-gradle-repo'
+}
+
+afterEvaluate {
+    tasks.withType(Test) {
+        testLogging {
+            showStackTraces true
+            exceptionFormat "full"
+            events "passed", "skipped", "failed", "standardOut", "standardError"
+        }
+    }
+
+    testDebug.dependsOn assembleDebug
+    testRelease.dependsOn assembleDebug
+}
+
+publish.dependsOn assembleRelease
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            groupId 'com.weightwatchers.circularreveal'
+            artifactId "${archivesBaseName}"
+            version "${version}"
+
+            artifact sourceJar {
+                classifier 'sources'
+            }
+
+            artifact ("${buildDir}/outputs/aar/${archivesBaseName}-release.aar") {
+                extension = 'aar'
+            }
+
+            // http://stackoverflow.com/a/24764713
+            pom.withXml {
+                def dependenciesNode = asNode().appendNode('dependencies')
+
+                configurations.compile.allDependencies.each {
+                    if (it.group) {
+                        def dependencyNode = dependenciesNode.appendNode('dependency')
+                        dependencyNode.appendNode('groupId', it.group)
+                        dependencyNode.appendNode('artifactId', it.name)
+                        dependencyNode.appendNode('version', it.version)
+
+                        if (it instanceof ModuleDependency) {
+                            def depExclusionsNode = dependencyNode.appendNode('exclusions')
+
+                            ((ModuleDependency) it).excludeRules.each {
+                                def exclusionNode = depExclusionsNode.appendNode('exclusion')
+                                exclusionNode.appendNode('groupId', it.group)
+                                exclusionNode.appendNode('artifactId', it.module)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    repositories {
+        maven {
+            url "file://${gitPublishConfig.home}/${gitPublishConfig.org}/${gitPublishConfig.repo}/releases"
+        }
+    }
+}
+
+task sourceJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
 }
