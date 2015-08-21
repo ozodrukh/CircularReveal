@@ -16,11 +16,13 @@ import io.codetail.animation.RevealAnimator.RevealInfo;
 
 import static android.os.Build.VERSION.SDK_INT;
 import static android.os.Build.VERSION_CODES.LOLLIPOP;
+import static android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH;
 import static io.codetail.animation.RevealAnimator.CLIP_RADIUS;
 
 public class ViewAnimationUtils {
 
     private final static boolean LOLLIPOP_PLUS = SDK_INT >= LOLLIPOP;
+    private final static boolean ICE_CREAM_SANDWICH_PLUS = SDK_INT >= ICE_CREAM_SANDWICH;
 
     public static final int SCALE_UP_DURATION = 500;
 
@@ -67,12 +69,10 @@ public class ViewAnimationUtils {
         return new SupportAnimatorPreL(reveal, revealLayout);
     }
 
-    private static Animator.AnimatorListener getRevealFinishListener(RevealAnimator target){
-        if(SDK_INT >= 18){
-            return new RevealAnimator.RevealFinishedJellyBeanMr2(target);
-        }else if(SDK_INT >= 14){
+    private static Animator.AnimatorListener getRevealFinishListener(RevealAnimator target) {
+        if(ICE_CREAM_SANDWICH_PLUS) {
             return new RevealAnimator.RevealFinishedIceCreamSandwich(target);
-        }else {
+        } else {
             return new RevealAnimator.RevealFinishedGingerbread(target);
         }
     }
