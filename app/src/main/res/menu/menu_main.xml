@@ -8,7 +8,7 @@
           app:showAsAction="never" />
 
     <item android:id="@+id/sampl3"
-          android:title="Sample2"
+          android:title="Sample3"
           android:orderInCategory="100"
           app:showAsAction="never" />
 </menu>
