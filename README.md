@@ -59,7 +59,9 @@ Use regular `RevealFrameLayout` & `RevealLinearLayout` don't worry, only target 
     int cy = (myView.getTop() + myView.getBottom()) / 2;
 
     // get the final radius for the clipping circle
-    int finalRadius = Math.max(myView.getWidth(), myView.getHeight());
+    int dx = Math.max(cx, myView.getWidth() - cx);
+    int dy = Math.max(cy, myView.getHeight() - cy);
+    float finalRadius = (float) Math.hypot(dx, dy);
 
     SupportAnimator animator =
             ViewAnimationUtils.createCircularReveal(myView, cx, cy, 0, finalRadius);
