@@ -121,4 +121,12 @@ final class SupportAnimatorPreL extends SupportAnimator {
             a.setupEndValues();
         }
     }
+
+    @Override
+    public void removeAllListeners() {
+        Animator a = mAnimator.get();
+        if(a != null){
+            a.removeAllListeners();
+        }
+    }
 }
