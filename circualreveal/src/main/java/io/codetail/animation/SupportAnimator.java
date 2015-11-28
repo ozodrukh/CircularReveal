@@ -31,13 +31,12 @@ public abstract class SupportAnimator {
      * value(s) set immediately, followed by calls to
      * {@link android.animation.Animator.AnimatorListener#onAnimationStart(android.animation.Animator)}
      * for any listeners of this animator.
-     *
+     * <p>
      * <p>The animation started by calling this method will be run on the thread that called
      * this method. This thread should have a Looper on it (a runtime exception will be thrown if
      * this is not the case). Also, if the animation will animate
      * properties of objects in the view hierarchy, then the calling thread should be the UI
      * thread for that view hierarchy.</p>
-     *
      */
     public abstract void start();
 
@@ -83,7 +82,7 @@ public abstract class SupportAnimator {
      * {@link AnimatorListener#onAnimationCancel()} to
      * its listeners, followed by an
      * {@link AnimatorListener#onAnimationEnd()} message.
-     *
+     * <p>
      * <p>This method must be called on the thread that is running the animation.</p>
      */
     public abstract void cancel();
@@ -93,7 +92,7 @@ public abstract class SupportAnimator {
      * animated, then calling the
      * {@link AnimatorListener#onAnimationEnd()} method on
      * its listeners.
-     *
+     * <p>
      * <p>This method must be called on the thread that is running the animation.</p>
      */
     public void end() {
@@ -127,12 +126,12 @@ public abstract class SupportAnimator {
      * Experimental feature
      */
     public SupportAnimator reverse() {
-        if(isRunning()){
+        if (isRunning()) {
             return null;
         }
 
         RevealAnimator target = mTarget.get();
-        if(target != null){
+        if (target != null) {
             return target.startReverseAnimation();
         }
 
@@ -194,4 +193,8 @@ public abstract class SupportAnimator {
         }
     }
 
+    /**
+     * Removes all listeners from this object.
+     */
+    public abstract void removeAllListeners();
 }
