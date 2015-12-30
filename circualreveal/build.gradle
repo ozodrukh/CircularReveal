@@ -7,11 +7,11 @@ android {
 
 
     defaultConfig {
-        minSdkVersion 9
+        minSdkVersion 15
         targetSdkVersion 22
     }
 }
 
 dependencies {
-    compile 'com.nineoldandroids:library:2.4.0'
+    compile 'com.android.support:support-v4:22.2.0'
 }

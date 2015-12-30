@@ -1,14 +1,13 @@
 package io.codetail.animation;
 
+import android.animation.Animator;
+import android.animation.ObjectAnimator;
 import android.annotation.TargetApi;
 import android.os.Build;
+import android.support.v4.view.ViewCompat;
 import android.view.View;
+import android.view.ViewPropertyAnimator;
 import android.view.animation.AccelerateDecelerateInterpolator;
-
-import com.nineoldandroids.animation.Animator;
-import com.nineoldandroids.animation.ObjectAnimator;
-import com.nineoldandroids.view.ViewHelper;
-import com.nineoldandroids.view.ViewPropertyAnimator;
 
 import java.lang.ref.WeakReference;
 
@@ -88,10 +87,10 @@ public class ViewAnimationUtils {
      */
     @Deprecated
     public static void liftingFromBottom(View view, float baseRotation, float fromY, int duration, int startDelay){
-        ViewHelper.setRotationX(view, baseRotation);
-        ViewHelper.setTranslationY(view, fromY);
+        ViewCompat.setRotationX(view, baseRotation);
+        ViewCompat.setTranslationY(view, fromY);
 
-        ViewPropertyAnimator
+        ViewCompat
                 .animate(view)
                 .setInterpolator(new AccelerateDecelerateInterpolator())
                 .setDuration(duration)
@@ -112,10 +111,10 @@ public class ViewAnimationUtils {
      */
     @Deprecated
     public static void liftingFromBottom(View view, float baseRotation, int duration, int startDelay){
-        ViewHelper.setRotationX(view, baseRotation);
-        ViewHelper.setTranslationY(view, view.getHeight() / 3);
+        ViewCompat.setRotationX(view, baseRotation);
+        ViewCompat.setTranslationY(view, view.getHeight() / 3);
 
-        ViewPropertyAnimator
+        ViewCompat
                 .animate(view)
                 .setInterpolator(new AccelerateDecelerateInterpolator())
                 .setDuration(duration)
@@ -135,10 +134,10 @@ public class ViewAnimationUtils {
      */
     @Deprecated
     public static void liftingFromBottom(View view, float baseRotation, int duration){
-        ViewHelper.setRotationX(view, baseRotation);
-        ViewHelper.setTranslationY(view, view.getHeight() / 3);
+        ViewCompat.setRotationX(view, baseRotation);
+        ViewCompat.setTranslationY(view, view.getHeight() / 3);
 
-        ViewPropertyAnimator
+        ViewCompat
                 .animate(view)
                 .setInterpolator(new AccelerateDecelerateInterpolator())
                 .setDuration(duration)

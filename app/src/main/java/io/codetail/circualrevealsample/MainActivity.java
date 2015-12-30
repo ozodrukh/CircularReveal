@@ -1,8 +1,10 @@
 package io.codetail.circualrevealsample;
 
+import android.animation.ObjectAnimator;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
@@ -20,9 +22,6 @@ import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.Interpolator;
 import android.widget.Toast;
-
-import com.nineoldandroids.animation.ObjectAnimator;
-import com.nineoldandroids.view.ViewHelper;
 
 import java.lang.ref.WeakReference;
 
@@ -302,14 +301,14 @@ public class MainActivity extends AppCompatActivity{
 
         public void hide(final View target, float distance){
             ObjectAnimator animator = ObjectAnimator.ofFloat(target, "translationY",
-                    ViewHelper.getTranslationY(target), distance);
+                    ViewCompat.getTranslationY(target), distance);
             animator.setInterpolator(DECELERATE);
             animator.start();
         }
 
         public void show(final View target){
             ObjectAnimator animator = ObjectAnimator.ofFloat(target, "translationY",
-                    ViewHelper.getTranslationY(target), 0f);
+                    ViewCompat.getTranslationY(target), 0f);
             animator.setInterpolator(ACCELERATE);
             animator.start();
         }
