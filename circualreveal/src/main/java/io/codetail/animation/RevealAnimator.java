@@ -1,16 +1,12 @@
 package io.codetail.animation;
 
-import android.annotation.TargetApi;
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.graphics.Rect;
-import android.os.Build;
+import android.util.Property;
 import android.view.View;
 
-import com.nineoldandroids.animation.Animator;
-import com.nineoldandroids.util.FloatProperty;
-
 import java.lang.ref.WeakReference;
-
-import static io.codetail.animation.ViewAnimationUtils.SimpleAnimationListener;
 
 /**
  * @hide
@@ -99,81 +95,47 @@ public interface RevealAnimator{
         }
     }
 
-    class RevealFinishedGingerbread extends SimpleAnimationListener {
+    class RevealFinishedIceCreamSandwich extends AnimatorListenerAdapter {
         WeakReference<RevealAnimator> mReference;
+        int mFeaturedLayerType;
+        int mLayerType;
 
-        RevealFinishedGingerbread(RevealAnimator target) {
+        RevealFinishedIceCreamSandwich(RevealAnimator target, int layerType) {
             mReference = new WeakReference<>(target);
+            mLayerType = ((View) target).getLayerType();
+            mFeaturedLayerType = layerType;
         }
 
         @Override
         public void onAnimationStart(Animator animation) {
             RevealAnimator target = mReference.get();
+            ((View) target).setLayerType(mFeaturedLayerType, null);
             target.onRevealAnimationStart();
         }
 
         @Override
         public void onAnimationCancel(Animator animation) {
             RevealAnimator target = mReference.get();
+            ((View) target).setLayerType(mLayerType, null);
             target.onRevealAnimationCancel();
         }
 
         @Override
         public void onAnimationEnd(Animator animation) {
             RevealAnimator target = mReference.get();
+            ((View) target).setLayerType(mLayerType, null);
             target.onRevealAnimationEnd();
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    class RevealFinishedIceCreamSandwich extends RevealFinishedGingerbread {
-        int mFeaturedLayerType;
-        int mLayerType;
-
-        RevealFinishedIceCreamSandwich(RevealAnimator target) {
-            super(target);
-
-            mLayerType = ((View) target).getLayerType();
-            mFeaturedLayerType = View.LAYER_TYPE_SOFTWARE;
-        }
-
-        @Override
-        public void onAnimationCancel(Animator animation) {
-            ((View) mReference.get()).setLayerType(mLayerType, null);
-            super.onAnimationEnd(animation);
-        }
-
-        @Override
-        public void onAnimationStart(Animator animation) {
-            ((View) mReference.get()).setLayerType(mFeaturedLayerType, null);
-            super.onAnimationStart(animation);
-        }
-
-        @Override
-        public void onAnimationEnd(Animator animation) {
-            ((View) mReference.get()).setLayerType(mLayerType, null);
-            super.onAnimationEnd(animation);
-        }
-    }
-
-    class RevealFinishedJellyBeanMr2 extends RevealFinishedIceCreamSandwich {
-
-        @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-        RevealFinishedJellyBeanMr2(RevealAnimator target) {
-            super(target);
-
-            mFeaturedLayerType = View.LAYER_TYPE_HARDWARE;
-        }
-    }
-
-    class RevealRadius extends FloatProperty<RevealAnimator> {
+    class RevealRadius extends Property<RevealAnimator, Float> {
 
         public RevealRadius() {
-            super("revealRadius");
+            super(Float.class, "revealRadius");
         }
 
         @Override
-        public void setValue(RevealAnimator object, float value) {
+        public void set(RevealAnimator object, Float value) {
             object.setRevealRadius(value);
         }
 

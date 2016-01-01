@@ -1,10 +1,10 @@
 package io.codetail.animation;
 
-import android.view.animation.Interpolator;
+import android.animation.Animator;
 
 import java.lang.ref.WeakReference;
 
-public abstract class SupportAnimator {
+public abstract class SupportAnimator extends Animator{
 
     WeakReference<RevealAnimator> mTarget;
 
@@ -21,7 +21,7 @@ public abstract class SupportAnimator {
     /**
      * @return depends from {@link android.os.Build.VERSION} if sdk version
      * {@link android.os.Build.VERSION_CODES#LOLLIPOP} and greater will return
-     * {@link android.animation.Animator} otherwise {@link com.nineoldandroids.animation.Animator}
+     * {@link android.animation.Animator}
      */
     public abstract Object get();
 
@@ -40,23 +40,6 @@ public abstract class SupportAnimator {
      *
      */
     public abstract void start();
-
-    /**
-     * Sets the duration of the animation.
-     *
-     * @param duration The length of the animation, in milliseconds.
-     */
-    public abstract void setDuration(int duration);
-
-    /**
-     * The time interpolator used in calculating the elapsed fraction of the
-     * animation. The interpolator determines whether the animation runs with
-     * linear or non-linear motion, such as acceleration and deceleration. The
-     * default value is {@link android.view.animation.AccelerateDecelerateInterpolator}.
-     *
-     * @param value the interpolator to be used by this animation
-     */
-    public abstract void setInterpolator(Interpolator value);
 
 
     /**

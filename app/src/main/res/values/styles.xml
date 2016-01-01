@@ -46,7 +46,7 @@
         </attr>
         <!-- Defines whether the foreground drawable should be drawn inside the padding.
              This property is turned on by default. -->
-        <attr name="foregroundInsidePadding" format="boolean" />
+        <attr name="foregroundInsidePadding"  />
         <!-- Determines whether to measure all children or just those in
              the VISIBLE or INVISIBLE state when measuring. Defaults to false. -->
         <attr name="measureAllChildren" format="boolean" />

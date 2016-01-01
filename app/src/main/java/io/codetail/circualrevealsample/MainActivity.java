@@ -1,5 +1,6 @@
 package io.codetail.circualrevealsample;
 
+import android.animation.ObjectAnimator;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -20,9 +21,6 @@ import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.Interpolator;
 import android.widget.Toast;
-
-import com.nineoldandroids.animation.ObjectAnimator;
-import com.nineoldandroids.view.ViewHelper;
 
 import java.lang.ref.WeakReference;
 
@@ -62,6 +60,7 @@ public class MainActivity extends AppCompatActivity{
         mCardsAdapter = new RecycleAdapter();
         mCardsAdapter.setHasStableIds(true);
 
+        mCardsGroup.addOnScrollListener(new HideExtraOnScroll(mToolbar));
         mCardsGroup.setHasFixedSize(true);
         mCardsGroup.setItemViewCacheSize(3);
         mCardsGroup.setClipToPadding(false);
@@ -156,20 +155,6 @@ public class MainActivity extends AppCompatActivity{
 
     static float hypo(int a, int b){
         return (float) Math.sqrt(Math.pow(a, 2) + Math.pow(b, 2));
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        mCardsGroup.setOnScrollListener(new HideExtraOnScroll(mToolbar));
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-
-        // Prevent memory leaks, fuck yeah!
-        mCardsGroup.setOnScrollListener(null);
     }
 
     public static class RecycleAdapter  extends RecyclerView.Adapter<CardHolder>{
@@ -302,14 +287,14 @@ public class MainActivity extends AppCompatActivity{
 
         public void hide(final View target, float distance){
             ObjectAnimator animator = ObjectAnimator.ofFloat(target, "translationY",
-                    ViewHelper.getTranslationY(target), distance);
+                    target.getTranslationY(), distance);
             animator.setInterpolator(DECELERATE);
             animator.start();
         }
 
         public void show(final View target){
             ObjectAnimator animator = ObjectAnimator.ofFloat(target, "translationY",
-                    ViewHelper.getTranslationY(target), 0f);
+                    target.getTranslationY(), 0f);
             animator.setInterpolator(ACCELERATE);
             animator.start();
         }
@@ -327,13 +312,23 @@ public class MainActivity extends AppCompatActivity{
         Intent intent = null;
 
         switch (item.getItemId()){
-            case R.id.sampl2:
+            case R.id.sample2:
                 intent = new Intent(this, Sample2Activity.class);
                 break;
 
-            case R.id.sampl3:
+            case R.id.sample3:
                 intent = new Intent(this, Sample3Activity.class);
                 break;
+
+            case R.id.sample4:
+
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .add(android.R.id.content, new FragmentRevealExample(), "fragment:reveal")
+                        .addToBackStack("fragment:reveal")
+                        .commit();
+
+                return true;
         }
 
         startActivity(intent);

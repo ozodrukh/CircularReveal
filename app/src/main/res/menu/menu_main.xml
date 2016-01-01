@@ -2,13 +2,18 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools" tools:context=".MainActivity">
 
-    <item android:id="@+id/sampl2"
+    <item android:id="@+id/sample2"
           android:title="Sample2"
           android:orderInCategory="100"
           app:showAsAction="never" />
 
-    <item android:id="@+id/sampl3"
+    <item android:id="@+id/sample3"
           android:title="Sample2"
+          android:orderInCategory="100"
+          app:showAsAction="never" />
+
+    <item android:id="@+id/sample4"
+          android:title="FragmentSample"
           android:orderInCategory="100"
           app:showAsAction="never" />
 </menu>

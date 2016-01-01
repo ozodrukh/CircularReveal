@@ -1,14 +1,10 @@
 package io.codetail.animation;
 
+import android.animation.ObjectAnimator;
 import android.annotation.TargetApi;
 import android.os.Build;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
-
-import com.nineoldandroids.animation.Animator;
-import com.nineoldandroids.animation.ObjectAnimator;
-import com.nineoldandroids.view.ViewHelper;
-import com.nineoldandroids.view.ViewPropertyAnimator;
 
 import java.lang.ref.WeakReference;
 
@@ -44,8 +40,36 @@ public class ViewAnimationUtils {
      */
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public static SupportAnimator createCircularReveal(View view,
+                                                       int centerX,  int centerY,
+                                                       float startRadius, float endRadius) {
+
+        return createCircularReveal(view, centerX, centerY, startRadius, endRadius, View.LAYER_TYPE_SOFTWARE);
+    }
+
+    /**
+     * Returns an Animator which can animate a clipping circle.
+     * <p>
+     * Any shadow cast by the View will respect the circular clip from this animator.
+     * <p>
+     * Only a single non-rectangular clip can be applied on a View at any time.
+     * Views clipped by a circular reveal animation take priority over
+     * {@link android.view.View#setClipToOutline(boolean) View Outline clipping}.
+     * <p>
+     * Note that the animation returned here is a one-shot animation. It cannot
+     * be re-used, and once started it cannot be paused or resumed.
+     *
+     * @param view The View will be clipped to the animating circle.
+     * @param centerX The x coordinate of the center of the animating circle.
+     * @param centerY The y coordinate of the center of the animating circle.
+     * @param startRadius The starting radius of the animating circle.
+     * @param endRadius The ending radius of the animating circle.
+     *
+     * @param layerType View layer type {@link View#LAYER_TYPE_HARDWARE} or {@link View#LAYER_TYPE_SOFTWARE}
+     */
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    public static SupportAnimator createCircularReveal(View view,
                                                 int centerX,  int centerY,
-                                                float startRadius, float endRadius) {
+                                                float startRadius, float endRadius, int layerType) {
 
         if(!(view.getParent() instanceof RevealAnimator)){
             throw new IllegalArgumentException("View must be inside RevealFrameLayout or RevealLinearLayout.");
@@ -56,25 +80,13 @@ public class ViewAnimationUtils {
                 new WeakReference<>(view)));
 
         if(LOLLIPOP_PLUS){
-            return new SupportAnimatorLollipop(android.view.ViewAnimationUtils
+            return new SupportAnimatorImpl(android.view.ViewAnimationUtils
                     .createCircularReveal(view, centerX, centerY, startRadius, endRadius), revealLayout);
         }
 
-        ObjectAnimator reveal = ObjectAnimator.ofFloat(revealLayout, CLIP_RADIUS,
-                startRadius, endRadius);
-        reveal.addListener(getRevealFinishListener(revealLayout));
-
-        return new SupportAnimatorPreL(reveal, revealLayout);
-    }
-
-    private static Animator.AnimatorListener getRevealFinishListener(RevealAnimator target){
-        if(SDK_INT >= 18){
-            return new RevealAnimator.RevealFinishedJellyBeanMr2(target);
-        }else if(SDK_INT >= 14){
-            return new RevealAnimator.RevealFinishedIceCreamSandwich(target);
-        }else {
-            return new RevealAnimator.RevealFinishedGingerbread(target);
-        }
+        ObjectAnimator reveal = ObjectAnimator.ofFloat(revealLayout, CLIP_RADIUS, startRadius, endRadius);
+        reveal.addListener(new RevealAnimator.RevealFinishedIceCreamSandwich(revealLayout, layerType));
+        return new SupportAnimatorImpl(reveal, revealLayout);
     }
 
     /**
@@ -88,11 +100,10 @@ public class ViewAnimationUtils {
      */
     @Deprecated
     public static void liftingFromBottom(View view, float baseRotation, float fromY, int duration, int startDelay){
-        ViewHelper.setRotationX(view, baseRotation);
-        ViewHelper.setTranslationY(view, fromY);
+        view.setRotationX(baseRotation);
+        view.setTranslationY(fromY);
 
-        ViewPropertyAnimator
-                .animate(view)
+        view.animate()
                 .setInterpolator(new AccelerateDecelerateInterpolator())
                 .setDuration(duration)
                 .setStartDelay(startDelay)
@@ -112,12 +123,10 @@ public class ViewAnimationUtils {
      */
     @Deprecated
     public static void liftingFromBottom(View view, float baseRotation, int duration, int startDelay){
-        ViewHelper.setRotationX(view, baseRotation);
-        ViewHelper.setTranslationY(view, view.getHeight() / 3);
+        view.setRotationX(baseRotation);
+        view.setTranslationY(view.getHeight() / 3);
 
-        ViewPropertyAnimator
-                .animate(view)
-                .setInterpolator(new AccelerateDecelerateInterpolator())
+        view.animate().setInterpolator(new AccelerateDecelerateInterpolator())
                 .setDuration(duration)
                 .setStartDelay(startDelay)
                 .rotationX(0)
@@ -135,40 +144,14 @@ public class ViewAnimationUtils {
      */
     @Deprecated
     public static void liftingFromBottom(View view, float baseRotation, int duration){
-        ViewHelper.setRotationX(view, baseRotation);
-        ViewHelper.setTranslationY(view, view.getHeight() / 3);
+        view.setRotationX(baseRotation);
+        view.setTranslationY(view.getHeight() / 3);
 
-        ViewPropertyAnimator
-                .animate(view)
-                .setInterpolator(new AccelerateDecelerateInterpolator())
+        view.animate().setInterpolator(new AccelerateDecelerateInterpolator())
                 .setDuration(duration)
                 .rotationX(0)
                 .translationY(0)
                 .start();
 
     }
-
-    static class SimpleAnimationListener implements Animator.AnimatorListener{
-
-        @Override
-        public void onAnimationStart(Animator animation) {
-
-        }
-
-        @Override
-        public void onAnimationEnd(Animator animation) {
-
-        }
-
-        @Override
-        public void onAnimationCancel(Animator animation) {
-
-        }
-
-        @Override
-        public void onAnimationRepeat(Animator animation) {
-
-        }
-    }
-
 }

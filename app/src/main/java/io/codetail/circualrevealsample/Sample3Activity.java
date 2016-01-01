@@ -1,18 +1,17 @@
 package io.codetail.circualrevealsample;
 
-import android.graphics.Rect;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.view.ViewTreeObserver.OnPreDrawListener;
 import android.view.animation.AccelerateDecelerateInterpolator;
 
 import io.codetail.animation.SupportAnimator;
 import io.codetail.animation.ViewAnimationUtils;
 
 public class Sample3Activity extends AppCompatActivity
-        implements ViewTreeObserver.OnGlobalLayoutListener{
+        implements OnPreDrawListener{
 
     private CardViewPlus mContentView;
 
@@ -23,7 +22,7 @@ public class Sample3Activity extends AppCompatActivity
 
         mContentView = (CardViewPlus) findViewById(R.id.content);
 
-        getViewTreeObserver().addOnGlobalLayoutListener(this);
+        getViewTreeObserver().addOnPreDrawListener(this);
     }
 
     protected View getRootView(){
@@ -35,23 +34,19 @@ public class Sample3Activity extends AppCompatActivity
     }
 
     protected void startRevealTransition(){
-        final Rect bounds = new Rect();
-        getRootView().getHitRect(bounds);
         SupportAnimator animator = ViewAnimationUtils.createCircularReveal(getRootView(),
-                bounds.right, bounds.bottom, 0, Sample2Activity.hypo(bounds.height(), bounds.width()));
+                getRootView().getRight(), getRootView().getBottom(), 0,
+                Sample2Activity.hypo(getRootView().getHeight(), getRootView().getWidth()),
+                View.LAYER_TYPE_SOFTWARE);
         animator.setDuration(1000);
         animator.setInterpolator(new AccelerateDecelerateInterpolator());
         animator.start();
     }
 
     @Override
-    public void onGlobalLayout() {
-        if(Build.VERSION.SDK_INT >= 16) {
-            getViewTreeObserver().removeOnGlobalLayoutListener(this);
-        }else{
-            getViewTreeObserver().removeGlobalOnLayoutListener(this);
-        }
-
+    public boolean onPreDraw() {
+        getViewTreeObserver().removeOnPreDrawListener(this);
         startRevealTransition();
+        return true;
     }
 }

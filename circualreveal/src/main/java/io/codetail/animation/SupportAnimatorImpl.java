@@ -1,29 +1,32 @@
 package io.codetail.animation;
 
-import android.view.animation.Interpolator;
-
-import com.nineoldandroids.animation.Animator;
+import android.animation.Animator;
+import android.animation.TimeInterpolator;
+import android.annotation.TargetApi;
+import android.os.Build;
 
 import java.lang.ref.WeakReference;
 
-final class SupportAnimatorPreL extends SupportAnimator {
+@TargetApi(Build.VERSION_CODES.HONEYCOMB)
+final class SupportAnimatorImpl extends SupportAnimator{
 
     WeakReference<Animator> mAnimator;
 
-    SupportAnimatorPreL(Animator animator, RevealAnimator target) {
+    SupportAnimatorImpl(Animator animator, RevealAnimator target) {
         super(target);
         mAnimator = new WeakReference<>(animator);
     }
 
     @Override
     public boolean isNativeAnimator() {
-        return false;
+        return true;
     }
 
     @Override
     public Object get() {
         return mAnimator.get();
     }
+
 
     @Override
     public void start() {
@@ -34,15 +37,16 @@ final class SupportAnimatorPreL extends SupportAnimator {
     }
 
     @Override
-    public void setDuration(int duration) {
+    public Animator setDuration(long duration) {
         Animator a = mAnimator.get();
         if(a != null) {
             a.setDuration(duration);
         }
+        return this;
     }
 
     @Override
-    public void setInterpolator(Interpolator value) {
+    public void setInterpolator(TimeInterpolator value) {
         Animator a = mAnimator.get();
         if(a != null) {
             a.setInterpolator(value);
@@ -104,6 +108,32 @@ final class SupportAnimatorPreL extends SupportAnimator {
         if(a != null){
             a.end();
         }
+    }
+
+    @Override
+    public long getStartDelay() {
+        Animator a = mAnimator.get();
+        if(a != null){
+            return a.getStartDelay();
+        }
+        return 0;
+    }
+
+    @Override
+    public void setStartDelay(long startDelay) {
+        Animator a = mAnimator.get();
+        if(a != null){
+            a.setStartDelay(startDelay);
+        }
+    }
+
+    @Override
+    public long getDuration() {
+        Animator a = mAnimator.get();
+        if(a != null){
+            return a.getDuration();
+        }
+        return 0;
     }
 
     @Override
