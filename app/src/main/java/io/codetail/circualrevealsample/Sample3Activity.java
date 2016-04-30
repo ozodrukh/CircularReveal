@@ -1,13 +1,12 @@
 package io.codetail.circualrevealsample;
 
+import android.animation.Animator;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.ViewTreeObserver.OnPreDrawListener;
 import android.view.animation.AccelerateDecelerateInterpolator;
-
-import io.codetail.animation.SupportAnimator;
 import io.codetail.animation.ViewAnimationUtils;
 
 public class Sample3Activity extends AppCompatActivity
@@ -34,7 +33,7 @@ public class Sample3Activity extends AppCompatActivity
     }
 
     protected void startRevealTransition(){
-        SupportAnimator animator = ViewAnimationUtils.createCircularReveal(getRootView(),
+        Animator animator = ViewAnimationUtils.createCircularReveal(getRootView(),
                 getRootView().getRight(), getRootView().getBottom(), 0,
                 Sample2Activity.hypo(getRootView().getHeight(), getRootView().getWidth()),
                 View.LAYER_TYPE_SOFTWARE);

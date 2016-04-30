@@ -1,5 +1,7 @@
 package io.codetail.circualrevealsample;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
@@ -9,9 +11,7 @@ import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.animation.AccelerateDecelerateInterpolator;
 
-import io.codetail.animation.SupportAnimator;
 import io.codetail.animation.ViewAnimationUtils;
-import io.codetail.animation.SupportAnimator.SimpleAnimatorListener;
 
 public class Sample2Activity extends AppCompatActivity
         implements ViewTreeObserver.OnGlobalLayoutListener{
@@ -41,13 +41,13 @@ public class Sample2Activity extends AppCompatActivity
         return getWindow().getDecorView().getViewTreeObserver();
     }
 
-    private SimpleAnimatorListener mCard1AnimatorListener = new SimpleAnimatorListener() {
+    private AnimatorListenerAdapter mCard1AnimatorListener = new AnimatorListenerAdapter() {
         @Override
-        public void onAnimationEnd() {
+        public void onAnimationEnd(Animator animator) {
             mCard2.setCardBackgroundColor(randomColor());
             mCard2.bringToFront();
 
-            SupportAnimator c2a =  next().create(mCard2, mCard2Bounds);
+            Animator c2a =  next().create(mCard2, mCard2Bounds);
             c2a.addListener(mCard2AnimatorListener);
             c2a.setDuration(1000);
             c2a.setInterpolator(new AccelerateDecelerateInterpolator());
@@ -55,9 +55,9 @@ public class Sample2Activity extends AppCompatActivity
         }
     };
 
-    private SimpleAnimatorListener mCard2AnimatorListener = new SimpleAnimatorListener() {
+    private AnimatorListenerAdapter mCard2AnimatorListener = new AnimatorListenerAdapter() {
         @Override
-        public void onAnimationEnd() {
+        public void onAnimationEnd(Animator animator) {
             startComplexAnimationOnCard1();
         }
     };
@@ -66,7 +66,7 @@ public class Sample2Activity extends AppCompatActivity
         mCard1.bringToFront();
         mCard1.setCardBackgroundColor(randomColor());
 
-        SupportAnimator c1a =  next().create(mCard1, mCard1Bounds);
+        Animator c1a =  next().create(mCard1, mCard1Bounds);
 
         c1a.addListener(mCard1AnimatorListener);
         c1a.setDuration(1000);
@@ -107,7 +107,7 @@ public class Sample2Activity extends AppCompatActivity
     }
 
     interface Creation{
-        SupportAnimator create(View view, Rect bounds);
+        Animator create(View view, Rect bounds);
     }
 
     public static float hypo(float a, float b){
@@ -116,33 +116,33 @@ public class Sample2Activity extends AppCompatActivity
 
     static class LeftTopSide implements Creation{
         @Override
-        public SupportAnimator create(View view, Rect bounds) {
+        public Animator create(View view, Rect bounds) {
             return ViewAnimationUtils.createCircularReveal(view, bounds.left, bounds.top, 0,
-                    hypo(bounds.width(), bounds.height()));
+                    hypo(bounds.width(), bounds.height()), View.LAYER_TYPE_HARDWARE);
         }
     }
 
     static class RightTopSide implements Creation{
         @Override
-        public SupportAnimator create(View view, Rect bounds) {
+        public Animator create(View view, Rect bounds) {
             return ViewAnimationUtils.createCircularReveal(view, bounds.right, bounds.top, 0,
-                    hypo(bounds.width(), bounds.height()));
+                    hypo(bounds.width(), bounds.height()), View.LAYER_TYPE_HARDWARE);
         }
     }
 
     static class RightBottomSide implements Creation{
         @Override
-        public SupportAnimator create(View view, Rect bounds) {
+        public Animator create(View view, Rect bounds) {
             return ViewAnimationUtils.createCircularReveal(view, bounds.right, bounds.bottom, 0,
-                    hypo(bounds.width(), bounds.height()));
+                    hypo(bounds.width(), bounds.height()), View.LAYER_TYPE_HARDWARE);
         }
     }
 
     static class LeftBottomSide implements Creation{
         @Override
-        public SupportAnimator create(View view, Rect bounds) {
+        public Animator create(View view, Rect bounds) {
             return ViewAnimationUtils.createCircularReveal(view, bounds.left, bounds.bottom, 0,
-                    hypo(bounds.width(), bounds.height()));
+                    hypo(bounds.width(), bounds.height()), View.LAYER_TYPE_HARDWARE);
         }
     }
 }
