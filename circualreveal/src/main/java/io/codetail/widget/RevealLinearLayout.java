@@ -9,7 +9,6 @@ import io.codetail.animation.RevealViewGroup;
 import io.codetail.animation.ViewRevealManager;
 
 public class RevealLinearLayout extends LinearLayout implements RevealViewGroup {
-
   private ViewRevealManager manager;
 
   public RevealLinearLayout(Context context) {

@@ -5,6 +5,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
 import android.graphics.Canvas;
 import android.graphics.Path;
+import android.graphics.Region;
 import android.util.Property;
 import android.view.View;
 import java.util.HashMap;
@@ -29,7 +30,6 @@ public class ViewRevealManager {
       @Override public void onAnimationStart(Animator animation) {
         RevealViewData data = getTarget(animation);
         data.animating = true;
-        targets.put(data.target, data);
       }
 
       @Override public void onAnimationEnd(Animator animation) {
@@ -86,18 +86,16 @@ public class ViewRevealManager {
     return revealData != null && revealData.transform(canvas, child);
   }
 
-  public static final class RevealViewData {
-    public final int centerX;
-    public final int centerY;
+  protected static final class RevealViewData {
+    final int centerX;
+    final int centerY;
 
-    public final float startRadius;
-    public final float endRadius;
+    final float startRadius;
+    final float endRadius;
 
-    /* Flag that indicates whether view is in animation mode, mutable */
-    public boolean animating;
+    /* Flag that indicates whether view is in animation mode, mutable */ boolean animating;
 
-    /* Revealed radius */
-    public float radius;
+    /* Revealed radius */ float radius;
 
     /* Animation target */ View target;
 
@@ -136,7 +134,7 @@ public class ViewRevealManager {
       path.reset();
       path.addCircle(centerX, centerY, radius, Path.Direction.CW);
 
-      canvas.clipPath(path);
+      canvas.clipPath(path, Region.Op.DIFFERENCE);
       return true;
     }
   }
@@ -148,7 +146,7 @@ public class ViewRevealManager {
    */
   private static final class RevealRadius extends Property<RevealViewData, Float> {
 
-    public RevealRadius() {
+    RevealRadius() {
       super(Float.class, "supportCircularReveal");
     }
 
@@ -162,7 +160,7 @@ public class ViewRevealManager {
     }
   }
 
-  public static class EnhanceViewAnimatorAdapter extends AnimatorListenerAdapter {
+  static class EnhanceViewAnimatorAdapter extends AnimatorListenerAdapter {
     private RevealViewData viewData;
     private int featuredLayerType;
     private int originalLayerType;

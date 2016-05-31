@@ -1,295 +1,162 @@
 package io.codetail.circualrevealsample;
 
 import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Intent;
+import android.graphics.Rect;
+import android.os.Build;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
+import android.support.annotation.Nullable;
+import android.support.v4.view.animation.FastOutSlowInInterpolator;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewConfiguration;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
-import android.view.animation.AccelerateDecelerateInterpolator;
-import android.view.animation.AccelerateInterpolator;
-import android.view.animation.DecelerateInterpolator;
-import android.view.animation.Interpolator;
+import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.InjectView;
+import butterknife.OnClick;
 import io.codetail.animation.ViewAnimationUtils;
-import io.codetail.circualrevealsample.widget.ViewUtils;
-import io.codetail.widget.RevealFrameLayout;
-import java.lang.ref.WeakReference;
 
 public class MainActivity extends AppCompatActivity {
+  public final static int LONG_DURATION = 400;
+  public final static int SHORT_DURATION = 200;
 
-  Toolbar toolbar;
-  RecyclerView recyclerView;
-  FloatingActionButton floatingActionButton;
+  @BindView(R.id.circlesLine) ViewGroup circlesLine;
+  @BindView(R.id.cardsLine) ViewGroup cardsLine;
+  @BindView(R.id.activator_mask) CardView activatorMask;
 
-  LinearLayoutManager layoutManager;
-  RecycleAdapter adapter;
-
-  private Animator animator;
-
-  @Override protected void onCreate(Bundle savedInstanceState) {
+  @Override protected void onCreate(@Nullable Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
+    ButterKnife.bind(this);
+  }
 
-    toolbar = (Toolbar) findViewById(R.id.toolbar);
-    recyclerView = (RecyclerView) findViewById(R.id.cardsGroup);
-    floatingActionButton = (FloatingActionButton) findViewById(R.id.floatingActionButton);
+  @OnClick(R.id.activator) void activateAwareMotion(View target) {
+    // Cancel all concurrent events on view
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+      target.cancelPendingInputEvents();
+    }
+    //target.setEnabled(false);
 
-    setSupportActionBar(toolbar);
+    // Coordinates of circle initial point
+    final ViewGroup parent = (ViewGroup) activatorMask.getParent();
+    final Rect bounds = new Rect();
+    final Rect maskBounds = new Rect();
 
-    layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
-    adapter = new RecycleAdapter();
-    adapter.setHasStableIds(true);
+    target.getDrawingRect(bounds);
+    activatorMask.getDrawingRect(maskBounds);
+    parent.offsetDescendantRectToMyCoords(target, bounds);
+    parent.offsetDescendantRectToMyCoords(activatorMask, maskBounds);
 
-    recyclerView.addOnScrollListener(new HideExtraOnScroll(toolbar));
-    recyclerView.setHasFixedSize(true);
-    recyclerView.setItemViewCacheSize(3);
-    recyclerView.setClipToPadding(false);
-    recyclerView.setAdapter(adapter);
-    recyclerView.setLayoutManager(layoutManager);
+    // Put Mask view at circle initial points
+    activatorMask.setVisibility(View.VISIBLE);
+    activatorMask.setX(bounds.left - maskBounds.centerX());
+    activatorMask.setY(bounds.top - maskBounds.centerY());
 
-    toolbar.getViewTreeObserver()
-        .addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-          @Override public void onGlobalLayout() {
-            ViewUtils.removeGlobalListeners(toolbar, this);
+    circlesLine.setVisibility(View.INVISIBLE);
 
-            final int outOfScreenY =
-                ((ViewGroup.MarginLayoutParams) floatingActionButton.getLayoutParams()).bottomMargin
-                    + floatingActionButton.getHeight();
+    final int cX = maskBounds.centerX();
+    final int cY = maskBounds.centerY();
 
-            liftingFromBottom(floatingActionButton, 0, outOfScreenY, 500, 0);
-          }
-        });
+    Animator circularReveal =
+        ViewAnimationUtils.createCircularReveal(activatorMask, cX, cY, target.getWidth() / 2,
+            (float) Math.hypot(maskBounds.width() * .5f, maskBounds.height() * .5f),
+            View.LAYER_TYPE_HARDWARE);
 
-    floatingActionButton.setOnClickListener(new View.OnClickListener() {
-      @Override public void onClick(View v) {
-        if (animator != null && animator.isRunning()) {
-          animator.cancel();
-          animator = null;
-          return;
-        } else {
-          final View myView = ((RevealFrameLayout) recyclerView.getChildAt(0)).getChildAt(0);
+    final int c0X = bounds.left - maskBounds.centerX(), c0Y = bounds.top - maskBounds.centerY();
 
-          // get the center for the clipping circle
-          //int cx = (myView.getLeft() + myView.getRight()) / 2;
-          //int cy = (myView.getTop() + myView.getBottom()) / 2;
-          int cx = myView.getRight();
-          int cy = myView.getBottom();
+    AnimatorPath path = new AnimatorPath();
+    path.moveTo(c0X, c0Y);
+    path.curveTo(c0X, c0Y, 0, c0Y, 0, 0);
 
-          // get the final radius for the clipping circle
-          float finalRadius = hypo(myView.getWidth(), myView.getHeight());
+    ObjectAnimator pathAnimator = ObjectAnimator.ofObject(this, "maskLocation", new PathEvaluator(),
+        path.getPoints().toArray());
 
-          animator = ViewAnimationUtils.createCircularReveal(myView, cx, cy, 0, finalRadius);
-        }
-
-        animator.setInterpolator(new AccelerateDecelerateInterpolator());
-        animator.setDuration(1500);
-        animator.start();
+    AnimatorSet set = new AnimatorSet();
+    set.playTogether(circularReveal, pathAnimator);
+    set.setInterpolator(new FastOutSlowInInterpolator());
+    set.setDuration(LONG_DURATION);
+    set.addListener(new AnimatorListenerAdapter() {
+      @Override public void onAnimationEnd(Animator animation) {
+        executeCardsSequentialAnimation();
       }
     });
+    set.start();
   }
 
-  static float hypo(int a, int b) {
-    return (float) Math.sqrt(Math.pow(a, 2) + Math.pow(b, 2));
+  private void executeCardsSequentialAnimation() {
+    cardsLine.setVisibility(View.VISIBLE);
+
+    final Animator[] animators = new Animator[cardsLine.getChildCount()];
+    for (int i = 0; i < cardsLine.getChildCount(); i++) {
+      View card = cardsLine.getChildAt(i);
+      card.setAlpha(0f);
+
+      animators[i] = ObjectAnimator.ofFloat(card, View.ALPHA, 0f, 1f);
+    }
+
+    final AnimatorSet sequential = new AnimatorSet();
+    sequential.playSequentially(animators);
+    sequential.setInterpolator(new FastOutSlowInInterpolator());
+    sequential.setDuration(SHORT_DURATION);
+    sequential.start();
   }
 
-  public static class RecycleAdapter extends RecyclerView.Adapter<CardHolder> {
+  @OnClick(R.id.reset) void resetUi(View resetCard) {
+    cardsLine.setVisibility(View.INVISIBLE);
 
-    @Override public CardHolder onCreateViewHolder(ViewGroup group, int i) {
-      LayoutInflater factory = LayoutInflater.from(group.getContext());
-      return new CardHolder(factory.inflate(R.layout.card_item, group, false));
-    }
+    final View target = ButterKnife.findById(this, R.id.activator);
 
-    @Override public void onBindViewHolder(CardHolder cardHolder, int i) {
-    }
+    // Coordinates of circle initial point
+    final ViewGroup parent = (ViewGroup) activatorMask.getParent();
+    final Rect bounds = new Rect();
+    final Rect maskBounds = new Rect();
 
-    @Override public int getItemCount() {
-      return 10;
-    }
-  }
+    target.getDrawingRect(bounds);
+    activatorMask.getDrawingRect(maskBounds);
+    parent.offsetDescendantRectToMyCoords(target, bounds);
+    parent.offsetDescendantRectToMyCoords(activatorMask, maskBounds);
 
-  public static class CardHolder extends RecyclerView.ViewHolder {
+    final int cX = maskBounds.centerX();
+    final int cY = maskBounds.centerY();
 
-    @InjectView(R.id.card) CardView mCard;
+    Animator circularReveal = ViewAnimationUtils.createCircularReveal(activatorMask, cX, cY,
+        (float) Math.hypot(maskBounds.width() * .5f, maskBounds.height() * .5f),
+        target.getWidth() / 2, View.LAYER_TYPE_HARDWARE);
 
-    RevealFrameLayout mReveal;
+    final int c0X = bounds.left - maskBounds.centerX(), c0Y = bounds.top - maskBounds.centerY();
 
-    public CardHolder(View itemView) {
-      super(itemView);
-      ButterKnife.inject(CardHolder.this, itemView);
+    AnimatorPath path = new AnimatorPath();
+    path.moveTo(0, 0);
+    path.curveTo(0, 0, 0, c0Y, c0X, c0Y);
 
-      mReveal = (RevealFrameLayout) mCard.getParent();
-    }
-  }
+    ObjectAnimator pathAnimator = ObjectAnimator.ofObject(this, "maskLocation", new PathEvaluator(),
+        path.getPoints().toArray());
 
-  public static class HideExtraOnScrollHelper {
-    public final static int UNKNOWN = -1;
-    public final static int TOP = 0;
-    public final static int BOTTOM = 1;
+    AnimatorSet set = new AnimatorSet();
+    set.playTogether(circularReveal, pathAnimator);
+    set.setInterpolator(new FastOutSlowInInterpolator());
+    set.setDuration(LONG_DURATION);
+    set.addListener(new AnimatorListenerAdapter() {
+      @Override public void onAnimationEnd(Animator animation) {
+        activatorMask.setVisibility(View.INVISIBLE);
 
-    int mDraggedAmount;
-    int mOldDirection;
-    int mDragDirection;
-
-    final int mMinFlingDistance;
-
-    public HideExtraOnScrollHelper(int minFlingDistance) {
-      mOldDirection = mDragDirection = mDraggedAmount = UNKNOWN;
-
-      mMinFlingDistance = minFlingDistance;
-    }
-
-    /**
-     * Checks need to hide extra objects on scroll or not
-     *
-     * @param dy scrolled distance y
-     * @return true if need to hide extra objects on screen
-     */
-    public boolean isObjectsShouldBeOutside(int dy) {
-      boolean needHide = false;
-      mDragDirection = dy > 0 ? BOTTOM : TOP;
-
-      if (mDragDirection != mOldDirection) {
-        mDraggedAmount = 0;
+        circlesLine.setVisibility(View.VISIBLE);
+        target.setEnabled(true);
       }
-
-      mDraggedAmount += dy;
-      boolean shouldBeOutside = false;
-
-      if (mDragDirection == TOP && Math.abs(mDraggedAmount) > mMinFlingDistance) {
-        shouldBeOutside = false;
-      } else if (mDragDirection == BOTTOM && mDraggedAmount > mMinFlingDistance) {
-        shouldBeOutside = true;
-      }
-
-      if (mOldDirection != mDragDirection) {
-        mOldDirection = mDragDirection;
-      }
-
-      return shouldBeOutside;
-    }
+    });
+    set.start();
   }
 
-  public static class HideExtraOnScroll extends RecyclerView.OnScrollListener {
-
-    final static Interpolator ACCELERATE = new AccelerateInterpolator();
-    final static Interpolator DECELERATE = new DecelerateInterpolator();
-
-    WeakReference<View> mTarget;
-    HideExtraOnScrollHelper mScrollHelper;
-
-    boolean isExtraObjectsOutside;
-
-    public HideExtraOnScroll(View target) {
-      int minimumFlingVelocity =
-          ViewConfiguration.get(target.getContext()).getScaledMinimumFlingVelocity();
-
-      mScrollHelper = new HideExtraOnScrollHelper(minimumFlingVelocity);
-      mTarget = new WeakReference<View>(target);
-    }
-
-    @Override public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-      super.onScrolled(recyclerView, dx, dy);
-
-      final View target = mTarget.get();
-
-      if (target == null) {
-        return;
-      }
-
-      boolean isObjectsShouldBeOutside = mScrollHelper.isObjectsShouldBeOutside(dy);
-
-      if (!isVisible(target) && !isObjectsShouldBeOutside) {
-        show(target);
-        isExtraObjectsOutside = false;
-      } else if (isVisible(target) && isObjectsShouldBeOutside) {
-        hide(target, -target.getHeight());
-        isExtraObjectsOutside = true;
-      }
-    }
-
-    public boolean isVisible(View target) {
-      return !isExtraObjectsOutside;
-    }
-
-    public void hide(final View target, float distance) {
-      ObjectAnimator animator =
-          ObjectAnimator.ofFloat(target, "translationY", target.getTranslationY(), distance);
-      animator.setInterpolator(DECELERATE);
-      animator.start();
-    }
-
-    public void show(final View target) {
-      ObjectAnimator animator =
-          ObjectAnimator.ofFloat(target, "translationY", target.getTranslationY(), 0f);
-      animator.setInterpolator(ACCELERATE);
-      animator.start();
-    }
+  public void setMaskLocation(PathPoint location) {
+    activatorMask.setX(location.mX);
+    activatorMask.setY(location.mY);
   }
 
-  @Override public boolean onCreateOptionsMenu(Menu menu) {
-    getMenuInflater().inflate(R.menu.menu_main, menu);
-    return true;
-  }
-
-  @Override public boolean onOptionsItemSelected(MenuItem item) {
-    Intent intent = null;
-
-    switch (item.getItemId()) {
-      case R.id.sample2:
-        intent = new Intent(this, Sample2Activity.class);
-        break;
-
-      case R.id.sample3:
-        intent = new Intent(this, Sample3Activity.class);
-        break;
-
-      case R.id.sample4:
-
-        getSupportFragmentManager().beginTransaction()
-            .add(android.R.id.content, new FragmentRevealExample(), "fragment:reveal")
-            .addToBackStack("fragment:reveal")
-            .commit();
-
-        return true;
-    }
-
+  @OnClick(R.id.open_radial_transformation) void open2Example() {
+    Intent intent = new Intent(this, RadialTransformationActivity.class);
     startActivity(intent);
-    return intent != null;
-  }
-
-  /**
-   * Lifting view
-   *
-   * @param view The animation target
-   * @param baseRotation initial Rotation X in 3D space
-   * @param fromY initial Y position of view
-   * @param duration aniamtion duration
-   * @param startDelay start delay before animation begin
-   */
-  public static void liftingFromBottom(View view, float baseRotation, float fromY, int duration,
-      int startDelay) {
-    view.setRotationX(baseRotation);
-    view.setTranslationY(fromY);
-
-    view.animate()
-        .setInterpolator(new AccelerateDecelerateInterpolator())
-        .setDuration(duration)
-        .setStartDelay(startDelay)
-        .rotationX(0)
-        .translationY(0)
-        .start();
   }
 }

@@ -79,7 +79,7 @@
     <dimen name="fab_action_icon_size">24dp</dimen>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.NoActionBar">
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="colorAccent">#294BCC</item>
     </style>

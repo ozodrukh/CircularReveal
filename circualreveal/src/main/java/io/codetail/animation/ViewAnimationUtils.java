@@ -3,16 +3,18 @@ package io.codetail.animation;
 import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.view.View;
+import android.view.ViewGroup;
 import io.codetail.animation.ViewRevealManager.EnhanceViewAnimatorAdapter;
+import io.codetail.view.BuildConfig;
 
 import static android.os.Build.VERSION.SDK_INT;
 import static android.os.Build.VERSION_CODES.LOLLIPOP;
 import static io.codetail.animation.ViewRevealManager.RevealViewData;
 
 public final class ViewAnimationUtils {
-  private final static boolean DEBUG = true;
+  private final static boolean DEBUG = BuildConfig.DEBUG;
 
-  final static boolean LOLLIPOP_PLUS = SDK_INT >= LOLLIPOP;
+  private final static boolean LOLLIPOP_PLUS = SDK_INT >= LOLLIPOP;
 
   /**
    * Returns an Animator which can animate a clipping circle.
@@ -63,14 +65,13 @@ public final class ViewAnimationUtils {
       float startRadius, float endRadius, int layerType) {
 
     if (!(view.getParent() instanceof RevealViewGroup)) {
-      throw new IllegalArgumentException(
-          "View must be inside RevealFrameLayout or RevealLinearLayout.");
+      throw new IllegalArgumentException("Parent must be instance of RevealViewGroup");
     }
 
     RevealViewGroup viewGroup = (RevealViewGroup) view.getParent();
     ViewRevealManager rm = viewGroup.getViewRevealManager();
 
-    if (!DEBUG && !rm.hasCustomerRevealAnimator() && LOLLIPOP_PLUS) {
+    if (!rm.hasCustomerRevealAnimator() && LOLLIPOP_PLUS) {
       return android.view.ViewAnimationUtils.createCircularReveal(view, centerX, centerY,
           startRadius, endRadius);
     }
