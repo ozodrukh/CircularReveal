@@ -3,17 +3,14 @@ CircularReveal
 
 Lollipop ViewAnimationUtils.createCircularReveal for everyone 14+
 
-<img src="http://7sbnrp.com1.z0.glb.clouddn.com/lollipop2-CircularReveal.gif" />
-
-<a href="http://www.youtube.com/watch?feature=player_embedded&v=_tPjpF75-BWA
-" target="_blank">Yotube Video <br /> <img src="http://img.youtube.com/vi/_tPjpF75-BWA/0.jpg" 
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=tPjpF75-BWA
+" target="_blank">Yotube Video <br /> <img src="http://img.youtube.com/vi/tPjpF75-BWA/0.jpg" 
 alt="Circular Reveal" width="320" height="240" border="10" /></a>
 
-Sample
-======
-<a href="https://github.com/ozodrukh/CircularReveal/releases"> Sample & .aar file </a>
+####[Checout demo application ](https://github.com/ozodrukh/CircularReveal/releases)
 
-Using
+
+How to use:
 ======
 
 Use regular `RevealFrameLayout` & `RevealLinearLayout` don't worry, only target will be clipped :)
