@@ -4,13 +4,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:clipToPadding="false"
+    android:clipChildren="false"
     tools:context=".MainActivity"
     >
 
 
   <LinearLayout
       android:id="@+id/circlesLine"
-      android:layout_width="match_parent"
+      android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:layout_gravity="center"
       android:clipChildren="false"
@@ -23,8 +25,8 @@
         android:id="@+id/activator"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
+        android:layout_marginLeft="@dimen/material_gap_large"
+        android:layout_marginRight="@dimen/material_gap_large"
         app:backgroundTint="#259DF7"
         app:fabSize="normal"
         />
@@ -33,8 +35,8 @@
         android:id="@+id/open_radial_transformation"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
+        android:layout_marginLeft="@dimen/material_gap_large"
+        android:layout_marginRight="@dimen/material_gap_large"
         app:backgroundTint="#259DF7"
         app:fabSize="normal"
         />
@@ -42,8 +44,8 @@
     <android.support.design.widget.FloatingActionButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
+        android:layout_marginLeft="@dimen/material_gap_large"
+        android:layout_marginRight="@dimen/material_gap_large"
         app:backgroundTint="#259DF7"
         app:fabSize="normal"
         />
@@ -63,43 +65,41 @@
   <LinearLayout
       android:id="@+id/cardsLine"
       android:layout_width="match_parent"
-      android:layout_height="wrap_content"
+      android:layout_height="match_parent"
       android:layout_gravity="center"
-      android:clipChildren="false"
-      android:clipToPadding="false"
+      android:visibility="invisible"
       android:gravity="center"
       android:orientation="horizontal"
-      android:visibility="invisible"
       >
 
     <android.support.v7.widget.CardView
         android:id="@+id/reset"
-        android:layout_width="64dp"
-        android:layout_height="64dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
+        android:layout_width="@dimen/material_card_width"
+        android:layout_height="@dimen/material_card_height"
+        android:layout_marginLeft="@dimen/material_gap_large"
+        android:layout_marginRight="@dimen/material_gap_large"
         app:cardCornerRadius="0dp"
-        app:elevation="2dp"
+        app:cardElevation="4dp"
         />
 
     <android.support.v7.widget.CardView
         android:id="@id/activator"
-        android:layout_width="64dp"
-        android:layout_height="64dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
+        android:layout_width="@dimen/material_card_width"
+        android:layout_height="@dimen/material_card_height"
+        android:layout_marginLeft="@dimen/material_gap_large"
+        android:layout_marginRight="@dimen/material_gap_large"
         app:cardCornerRadius="0dp"
-        app:elevation="2dp"
+        app:cardElevation="4dp"
         />
 
     <android.support.v7.widget.CardView
         android:id="@id/activator"
-        android:layout_width="64dp"
-        android:layout_height="64dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
+        android:layout_width="@dimen/material_card_width"
+        android:layout_height="@dimen/material_card_height"
+        android:layout_marginLeft="@dimen/material_gap_large"
+        android:layout_marginRight="@dimen/material_gap_large"
         app:cardCornerRadius="0dp"
-        app:elevation="2dp"
+        app:cardElevation="4dp"
         />
 
   </LinearLayout>

@@ -2,4 +2,9 @@
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
+    <dimen name="material_card_width">96dp</dimen>
+    <dimen name="material_card_height">96dp</dimen>
+    <dimen name="material_gap_large">16dp</dimen>
+    <dimen name="radial_card_width">220dp</dimen>
+    <dimen name="radial_card_height">220dp</dimen>
 </resources>
