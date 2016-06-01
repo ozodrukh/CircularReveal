@@ -1,22 +1,17 @@
 CircularReveal
 ==============
 
-Lollipop ViewAnimationUtils.createCircularReveal for everyone 2.3+
+Lollipop ViewAnimationUtils.createCircularReveal for everyone 14+
 
 <img src="http://7sbnrp.com1.z0.glb.clouddn.com/lollipop2-CircularReveal.gif" />
 
-<a href="http://www.youtube.com/watch?feature=player_embedded&v=_vVpwzYb4Dg
-" target="_blank">Yotube Video <br /> <img src="http://img.youtube.com/vi/_vVpwzYb4Dg/0.jpg" 
-alt="Ripple DEMO" width="320" height="240" border="10" /></a>
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=_tPjpF75-BWA
+" target="_blank">Yotube Video <br /> <img src="http://img.youtube.com/vi/_tPjpF75-BWA/0.jpg" 
+alt="Circular Reveal" width="320" height="240" border="10" /></a>
 
 Sample
 ======
 <a href="https://github.com/ozodrukh/CircularReveal/releases"> Sample & .aar file </a>
-
-Note
-====
-
-depends from Jake Wharton's NineOldsAndroid, or use my modifed version (included auto cancel)
 
 Using
 ======
@@ -62,32 +57,13 @@ Use regular `RevealFrameLayout` & `RevealLinearLayout` don't worry, only target 
     int dx = Math.max(cx, myView.getWidth() - cx);
     int dy = Math.max(cy, myView.getHeight() - cy);
     float finalRadius = (float) Math.hypot(dx, dy);
-
-    SupportAnimator animator =
+    
+    // Android native animator
+    Animator animator =
             ViewAnimationUtils.createCircularReveal(myView, cx, cy, 0, finalRadius);
     animator.setInterpolator(new AccelerateDecelerateInterpolator());
     animator.setDuration(1500);
     animator.start();
-
-```
-
-####API that need to mention 
-
-#####Cancel it! 
-
-```java
-
-   SupportAnimator animator = ... ;
-   animator.cancel();         
-
-```
-
-#####Reverse it!
-
-```java
-
-   SupportAnimator animator = ... ;
-   animator = animator.reverse(); // override with new one
 
 ```
 
@@ -110,7 +86,7 @@ then add a library dependency
 
 ```groovy
 	dependencies {
-	    compile ('com.github.ozodrukh:CircularReveal:1.3.1@aar') {
+	    compile ('com.github.ozodrukh:CircularReveal:2.0.0@aar') {
 	        transitive = true;
 	    }
 	}
@@ -122,7 +98,7 @@ License
 
     The MIT License (MIT)
 
-    Copyright (c) 2014 Abdullaev Ozodrukh
+    Copyright (c) 2016 Abdullaev Ozodrukh
     
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
