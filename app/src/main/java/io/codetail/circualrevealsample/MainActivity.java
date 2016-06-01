@@ -1,337 +1,246 @@
 package io.codetail.circualrevealsample;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Intent;
+import android.graphics.Rect;
+import android.os.Build;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
+import android.support.annotation.Nullable;
+import android.support.v4.view.animation.FastOutLinearInInterpolator;
+import android.support.v4.view.animation.FastOutSlowInInterpolator;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.util.Property;
 import android.view.View;
-import android.view.ViewConfiguration;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
-import android.view.animation.AccelerateDecelerateInterpolator;
-import android.view.animation.AccelerateInterpolator;
-import android.view.animation.DecelerateInterpolator;
-import android.view.animation.Interpolator;
-import android.widget.Toast;
-
-import java.lang.ref.WeakReference;
-
+import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.InjectView;
-import io.codetail.animation.SupportAnimator;
+import butterknife.OnClick;
 import io.codetail.animation.ViewAnimationUtils;
-import io.codetail.circualrevealsample.widget.ViewUtils;
-import io.codetail.widget.RevealFrameLayout;
 
-public class MainActivity extends AppCompatActivity{
+/**
+ * Aware section
+ * https://www.google.com/design/spec/motion/material-motion.html#material-motion-how-does-material-move
+ */
+public class MainActivity extends AppCompatActivity {
+  final static int SLOW_DURATION = 400;
+  final static int FAST_DURATION = 200;
 
-    @InjectView(R.id.toolbar)
-    Toolbar mToolbar;
+  @BindView(R.id.circlesLine) ViewGroup circlesLine;
+  @BindView(R.id.cardsLine) ViewGroup cardsLine;
+  @BindView(R.id.activator_mask) CardView activatorMask;
 
-    @InjectView(R.id.floatingActionButton)
-    FloatingActionButton mFloatingButton;
+  private float maskElevation;
 
-    @InjectView(R.id.cardsGroup)
-    RecyclerView mCardsGroup;
+  @Override protected void onCreate(@Nullable Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    setContentView(R.layout.activity_main);
+    ButterKnife.bind(this);
+  }
 
-    LinearLayoutManager mLayoutManager;
-    RecycleAdapter mCardsAdapter;
+  @OnClick(R.id.activator) void activateAwareMotion(View target) {
+    // Cancel all concurrent events on view
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+      target.cancelPendingInputEvents();
+    }
+    target.setEnabled(false);
 
-    private SupportAnimator mAnimator;
+    // Coordinates of circle initial point
+    final ViewGroup parent = (ViewGroup) activatorMask.getParent();
+    final Rect bounds = new Rect();
+    final Rect maskBounds = new Rect();
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        ButterKnife.inject(this);
-        ButterKnife.setDebug(true);
+    target.getDrawingRect(bounds);
+    activatorMask.getDrawingRect(maskBounds);
+    parent.offsetDescendantRectToMyCoords(target, bounds);
+    parent.offsetDescendantRectToMyCoords(activatorMask, maskBounds);
 
-        setSupportActionBar(mToolbar);
+    // Put Mask view at circle initial points
+    maskElevation = activatorMask.getCardElevation();
+    activatorMask.setCardElevation(0);
+    activatorMask.setVisibility(View.VISIBLE);
+    activatorMask.setX(bounds.left - maskBounds.centerX());
+    activatorMask.setY(bounds.top - maskBounds.centerY());
 
-        mLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
-        mCardsAdapter = new RecycleAdapter();
-        mCardsAdapter.setHasStableIds(true);
+    circlesLine.setVisibility(View.INVISIBLE);
 
-        mCardsGroup.addOnScrollListener(new HideExtraOnScroll(mToolbar));
-        mCardsGroup.setHasFixedSize(true);
-        mCardsGroup.setItemViewCacheSize(3);
-        mCardsGroup.setClipToPadding(false);
-        mCardsGroup.setAdapter(mCardsAdapter);
-        mCardsGroup.setLayoutManager(mLayoutManager);
+    final int cX = maskBounds.centerX();
+    final int cY = maskBounds.centerY();
 
-        mToolbar.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                ViewUtils.removeGlobalListeners(mToolbar, this);
+    Animator circularReveal =
+        ViewAnimationUtils.createCircularReveal(activatorMask, cX, cY, target.getWidth() / 2,
+            (float) Math.hypot(maskBounds.width() * .5f, maskBounds.height() * .5f),
+            View.LAYER_TYPE_HARDWARE);
 
-                final int outOfScreenY = ((ViewGroup.MarginLayoutParams) mFloatingButton.getLayoutParams())
-                        .bottomMargin + mFloatingButton.getHeight();
+    final float c0X = bounds.centerX() - maskBounds.centerX();
+    final float c0Y = bounds.centerY() - maskBounds.centerY();
 
-                ViewAnimationUtils.liftingFromBottom(mFloatingButton, 0, outOfScreenY, 500, 0);
-            }
-        });
+    AnimatorPath path = new AnimatorPath();
+    path.moveTo(c0X, c0Y);
+    path.curveTo(c0X, c0Y, 0, c0Y, 0, 0);
 
-        mFloatingButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+    ObjectAnimator pathAnimator = ObjectAnimator.ofObject(this, "maskLocation", new PathEvaluator(),
+        path.getPoints().toArray());
 
-                if(mAnimator != null && !mAnimator.isRunning()){
-                    mAnimator = mAnimator.reverse();
-                    mAnimator.addListener(new SupportAnimator.AnimatorListener() {
-                        @Override
-                        public void onAnimationStart() {
+    AnimatorSet set = new AnimatorSet();
+    set.playTogether(circularReveal, pathAnimator);
+    set.setInterpolator(new FastOutSlowInInterpolator());
+    set.setDuration(SLOW_DURATION);
+    set.addListener(new AnimatorListenerAdapter() {
+      @Override public void onAnimationEnd(Animator animation) {
+        executeCardsSequentialAnimation();
+        activatorMask.setCardElevation(maskElevation);
+      }
+    });
+    set.start();
+  }
 
-                        }
+  private void executeCardsSequentialAnimation() {
+    final int length = cardsLine.getChildCount();
+    cardsLine.setVisibility(View.VISIBLE);
 
-                        @Override
-                        public void onAnimationEnd() {
-                            mAnimator = null;
-                        }
+    final Animator[] animators = new Animator[length];
+    for (int i = 0; i < length; i++) {
+      View target = cardsLine.getChildAt(i);
+      final float x0 = 0;// i == 0 ? 0 : -10 * (1 + i * 0.2f);
+      final float y0 = 10 * i;
 
-                        @Override
-                        public void onAnimationCancel() {
+      target.setTranslationX(x0);
+      target.setTranslationY(y0);
 
-                        }
+      AnimatorPath path = new AnimatorPath();
+      path.moveTo(x0, y0);
+      path.lineTo(0, 0);
 
-                        @Override
-                        public void onAnimationRepeat() {
+      PathPoint[] points = new PathPoint[path.getPoints().size()];
+      path.getPoints().toArray(points);
 
-                        }
-                    });
-                }else if(mAnimator != null){
-                    mAnimator.cancel();
-                    return;
-                }else {
+      AnimatorSet set = new AnimatorSet();
+      set.play(ObjectAnimator.ofObject(target, PATH_POINT, new PathEvaluator(), points))
+          .with(ObjectAnimator.ofFloat(target, View.ALPHA, 0.8f, 1f));
 
-                    final View myView = ((RevealFrameLayout) mCardsGroup.getChildAt(0)).getChildAt(0);
-
-                    // get the center for the clipping circle
-                    //int cx = (myView.getLeft() + myView.getRight()) / 2;
-                    //int cy = (myView.getTop() + myView.getBottom()) / 2;
-                    int cx = myView.getRight();
-                    int cy = myView.getBottom();
-
-                    // get the final radius for the clipping circle
-                    float finalRadius = hypo(myView.getWidth(), myView.getHeight());
-
-                    mAnimator = ViewAnimationUtils.createCircularReveal(myView, cx, cy, 0, finalRadius);
-                    mAnimator.addListener(new SupportAnimator.AnimatorListener() {
-                        @Override
-                        public void onAnimationStart() {
-                        }
-
-                        @Override
-                        public void onAnimationEnd() {
-                            Toast.makeText(getApplicationContext(), "Done", Toast.LENGTH_LONG).show();
-                        }
-
-                        @Override
-                        public void onAnimationCancel() {
-
-                        }
-
-                        @Override
-                        public void onAnimationRepeat() {
-
-                        }
-                    });
-                }
-
-                mAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
-                mAnimator.setDuration(1500);
-                mAnimator.start();
-            }
-        });
-
+      animators[i] = set;
+      animators[i].setStartDelay(15 * i);
     }
 
-    static float hypo(int a, int b){
-        return (float) Math.sqrt(Math.pow(a, 2) + Math.pow(b, 2));
+    final AnimatorSet sequential = new AnimatorSet();
+    sequential.playTogether(animators);
+    sequential.setInterpolator(new FastOutLinearInInterpolator());
+    sequential.setDuration(FAST_DURATION);
+    sequential.start();
+  }
+
+  @OnClick(R.id.reset) void resetUi(View resetCard) {
+    cardsLine.setVisibility(View.INVISIBLE);
+
+    final View target = ButterKnife.findById(this, R.id.activator);
+
+    // Coordinates of circle initial point
+    final ViewGroup parent = (ViewGroup) activatorMask.getParent();
+    final Rect bounds = new Rect();
+    final Rect maskBounds = new Rect();
+
+    target.getDrawingRect(bounds);
+    activatorMask.getDrawingRect(maskBounds);
+    parent.offsetDescendantRectToMyCoords(target, bounds);
+    parent.offsetDescendantRectToMyCoords(activatorMask, maskBounds);
+
+    maskElevation = activatorMask.getCardElevation();
+    activatorMask.setCardElevation(0);
+
+    final int cX = maskBounds.centerX();
+    final int cY = maskBounds.centerY();
+
+    final Animator circularReveal = ViewAnimationUtils.createCircularReveal(activatorMask, cX, cY,
+        (float) Math.hypot(maskBounds.width() * .5f, maskBounds.height() * .5f),
+        target.getWidth() / 2f, View.LAYER_TYPE_HARDWARE);
+
+    final float c0X = bounds.centerX() - maskBounds.centerX();
+    final float c0Y = bounds.centerY() - maskBounds.centerY();
+
+    AnimatorPath path = new AnimatorPath();
+    path.moveTo(0, 0);
+    path.curveTo(0, 0, 0, c0Y, c0X, c0Y);
+
+    ObjectAnimator pathAnimator = ObjectAnimator.ofObject(this, "maskLocation", new PathEvaluator(),
+        path.getPoints().toArray());
+
+    AnimatorSet set = new AnimatorSet();
+    set.playTogether(circularReveal, pathAnimator);
+    set.setInterpolator(new FastOutSlowInInterpolator());
+    set.setDuration(SLOW_DURATION);
+    set.addListener(new AnimatorListenerAdapter() {
+      @Override public void onAnimationEnd(Animator animation) {
+        activatorMask.setCardElevation(maskElevation);
+        activatorMask.setVisibility(View.INVISIBLE);
+
+        circlesLine.setVisibility(View.VISIBLE);
+        executeCirclesDropDown();
+        target.setEnabled(true);
+      }
+    });
+    set.start();
+  }
+
+  private void executeCirclesDropDown() {
+    final int length = circlesLine.getChildCount();
+    Animator[] animators = new Animator[length];
+    for (int i = 0; i < length; i++) {
+      View target = circlesLine.getChildAt(i);
+      final float x0 = -10 * i;
+      final float y0 = -10 * i;
+
+      target.setTranslationX(x0);
+      target.setTranslationY(y0);
+
+      AnimatorPath path = new AnimatorPath();
+      path.moveTo(x0, y0);
+      path.curveTo(x0, y0, 0, y0, 0, 0);
+
+      PathPoint[] points = new PathPoint[path.getPoints().size()];
+      path.getPoints().toArray(points);
+
+      AnimatorSet set = new AnimatorSet();
+      set.play(ObjectAnimator.ofObject(target, PATH_POINT, new PathEvaluator(), points))
+          .with(ObjectAnimator.ofFloat(target, View.ALPHA, (length - i) * 0.1f + 0.6f, 1f));
+
+      animators[i] = set;
+      animators[i].setStartDelay(15 * i);
     }
 
-    public static class RecycleAdapter  extends RecyclerView.Adapter<CardHolder>{
+    AnimatorSet set = new AnimatorSet();
+    set.playTogether(animators);
+    set.setInterpolator(new FastOutSlowInInterpolator());
+    set.setDuration(FAST_DURATION);
+    set.start();
+  }
 
-        @Override
-        public CardHolder onCreateViewHolder(ViewGroup group, int i) {
-            LayoutInflater factory = LayoutInflater.from(group.getContext());
-            return new CardHolder(factory.inflate(R.layout.card_item, group, false));
+  private final static Property<View, PathPoint> PATH_POINT =
+      new Property<View, PathPoint>(PathPoint.class, "PATH_POINT") {
+        PathPoint point;
+
+        @Override public PathPoint get(View object) {
+          return point;
         }
 
-        @Override
-        public void onBindViewHolder(CardHolder cardHolder, int i) {
+        @Override public void set(View object, PathPoint value) {
+          point = value;
+
+          object.setTranslationX(value.mX);
+          object.setTranslationY(value.mY);
         }
+      };
 
-        @Override
-        public int getItemCount() {
-            return 10;
-        }
-    }
+  public void setMaskLocation(PathPoint location) {
+    activatorMask.setX(location.mX);
+    activatorMask.setY(location.mY);
+  }
 
-    public static class CardHolder extends RecyclerView.ViewHolder{
-
-        @InjectView(R.id.card)
-        CardView mCard;
-
-        RevealFrameLayout mReveal;
-
-        public CardHolder(View itemView) {
-            super(itemView);
-            ButterKnife.inject(CardHolder.this, itemView);
-
-            mReveal = (RevealFrameLayout) mCard.getParent();
-        }
-    }
-
-
-    public static class HideExtraOnScrollHelper{
-        public final static int UNKNOWN = -1;
-        public final static int TOP = 0;
-        public final static int BOTTOM = 1;
-
-        int mDraggedAmount;
-        int mOldDirection;
-        int mDragDirection;
-
-        final int mMinFlingDistance;
-
-        public HideExtraOnScrollHelper(int minFlingDistance) {
-            mOldDirection  =
-                    mDragDirection =
-                            mDraggedAmount = UNKNOWN;
-
-            mMinFlingDistance = minFlingDistance;
-        }
-
-        /**
-         * Checks need to hide extra objects on scroll or not
-         *
-         * @param dy scrolled distance y
-         * @return true if need to hide extra objects on screen
-         */
-        public boolean isObjectsShouldBeOutside(int dy){
-            boolean needHide = false;
-            mDragDirection = dy > 0 ? BOTTOM : TOP;
-
-            if(mDragDirection != mOldDirection){
-                mDraggedAmount = 0;
-            }
-
-            mDraggedAmount += dy;
-            boolean shouldBeOutside = false;
-
-            if(mDragDirection == TOP && Math.abs(mDraggedAmount) > mMinFlingDistance){
-                shouldBeOutside = false;
-            }else if(mDragDirection == BOTTOM && mDraggedAmount > mMinFlingDistance){
-                shouldBeOutside = true;
-            }
-
-            if(mOldDirection != mDragDirection){
-                mOldDirection = mDragDirection;
-            }
-
-            return shouldBeOutside;
-        }
-    }
-
-
-    public static class HideExtraOnScroll extends RecyclerView.OnScrollListener{
-
-        final static Interpolator ACCELERATE = new AccelerateInterpolator();
-        final static Interpolator DECELERATE = new DecelerateInterpolator();
-
-        WeakReference<View> mTarget;
-        HideExtraOnScrollHelper mScrollHelper;
-
-        boolean isExtraObjectsOutside;
-
-        public HideExtraOnScroll(View target) {
-            int minimumFlingVelocity = ViewConfiguration.get(target.getContext())
-                    .getScaledMinimumFlingVelocity();
-
-            mScrollHelper = new HideExtraOnScrollHelper(minimumFlingVelocity);
-            mTarget = new WeakReference<View>(target);
-        }
-
-        @Override
-        public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-            super.onScrolled(recyclerView, dx, dy);
-
-            final View target = mTarget.get();
-
-            if(target == null) {
-                return;
-            }
-
-            boolean isObjectsShouldBeOutside = mScrollHelper.isObjectsShouldBeOutside(dy);
-
-            if(!isVisible(target) && !isObjectsShouldBeOutside){
-                show(target);
-                isExtraObjectsOutside = false;
-            }else if(isVisible(target) && isObjectsShouldBeOutside){
-                hide(target, -target.getHeight());
-                isExtraObjectsOutside = true;
-            }
-        }
-
-        public boolean isVisible(View target){
-            return !isExtraObjectsOutside;
-        }
-
-        public void hide(final View target, float distance){
-            ObjectAnimator animator = ObjectAnimator.ofFloat(target, "translationY",
-                    target.getTranslationY(), distance);
-            animator.setInterpolator(DECELERATE);
-            animator.start();
-        }
-
-        public void show(final View target){
-            ObjectAnimator animator = ObjectAnimator.ofFloat(target, "translationY",
-                    target.getTranslationY(), 0f);
-            animator.setInterpolator(ACCELERATE);
-            animator.start();
-        }
-
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        Intent intent = null;
-
-        switch (item.getItemId()){
-            case R.id.sample2:
-                intent = new Intent(this, Sample2Activity.class);
-                break;
-
-            case R.id.sample3:
-                intent = new Intent(this, Sample3Activity.class);
-                break;
-
-            case R.id.sample4:
-
-                getSupportFragmentManager()
-                        .beginTransaction()
-                        .add(android.R.id.content, new FragmentRevealExample(), "fragment:reveal")
-                        .addToBackStack("fragment:reveal")
-                        .commit();
-
-                return true;
-        }
-
-        startActivity(intent);
-        return intent != null;
-    }
+  @OnClick(R.id.open_radial_transformation) void open2Example() {
+    Intent intent = new Intent(this, RadialTransformationActivity.class);
+    startActivity(intent);
+  }
 }
