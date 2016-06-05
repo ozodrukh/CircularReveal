@@ -3,7 +3,6 @@ package io.codetail.animation;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
-import android.annotation.TargetApi;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -61,7 +60,7 @@ public class ViewRevealManager {
    * in order to use your own custom one
    */
   protected boolean hasCustomerRevealAnimator() {
-    return true;
+    return false;
   }
 
   /**
@@ -89,7 +88,7 @@ public class ViewRevealManager {
     return revealData != null && revealData.applyTransformation(canvas, child);
   }
 
-  @TargetApi(Build.VERSION_CODES.LOLLIPOP) public static final class RevealValues {
+  public static final class RevealValues {
     private static final Paint debugPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
     static {
@@ -180,8 +179,10 @@ public class ViewRevealManager {
       // trick to applyTransformation animation, when even x & y translations are running
       path.addCircle(child.getX() + centerX, child.getY() + centerY, radius, Path.Direction.CW);
 
-      child.invalidateOutline();
       canvas.clipPath(path, op);
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        child.invalidateOutline();
+      }
       return true;
     }
   }
