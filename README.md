@@ -4,7 +4,7 @@ CircularReveal
 Lollipop ViewAnimationUtils.createCircularReveal for everyone 14+
 
 <a href="http://www.youtube.com/watch?feature=player_embedded&v=tPjpF75-BWA
-" target="_blank">Yotube Video <br /> <img src="http://img.youtube.com/vi/tPjpF75-BWA/0.jpg" 
+" target="_blank">Yotube Video <br /> <img src="http://img.youtube.com/vi/tPjpF75-BWA/0.jpg"
 alt="Circular Reveal" width="320" height="240" border="10" /></a>
 
 ####[Checout demo application ](https://github.com/ozodrukh/CircularReveal/releases)
@@ -20,7 +20,7 @@ Use regular `RevealFrameLayout` & `RevealLinearLayout` don't worry, only target 
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-    
+
     <!-- Put more views here if you want, it's stock frame layout  -->
 
     <android.support.v7.widget.CardView
@@ -54,7 +54,7 @@ Use regular `RevealFrameLayout` & `RevealLinearLayout` don't worry, only target 
     int dx = Math.max(cx, myView.getWidth() - cx);
     int dy = Math.max(cy, myView.getHeight() - cy);
     float finalRadius = (float) Math.hypot(dx, dy);
-    
+
     // Android native animator
     Animator animator =
             ViewAnimationUtils.createCircularReveal(myView, cx, cy, 0, finalRadius);
@@ -83,7 +83,7 @@ then add a library dependency
 
 ```groovy
 	dependencies {
-	    compile ('com.github.ozodrukh:CircularReveal:2.0.0@aar') {
+	    compile ('com.github.ozodrukh:CircularReveal:2.0.1@aar') {
 	        transitive = true;
 	    }
 	}
@@ -96,17 +96,17 @@ License
     The MIT License (MIT)
 
     Copyright (c) 2016 Abdullaev Ozodrukh
-    
+
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
     in the Software without restriction, including without limitation the rights
     to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
     copies of the Software, and to permit persons to whom the Software is
     furnished to do so, subject to the following conditions:
-    
+
     The above copyright notice and this permission notice shall be included in
     all copies or substantial portions of the Software.
-    
+
     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
     IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
     FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
