@@ -179,8 +179,9 @@ public class ViewRevealManager {
       path.reset();
       // trick to applyTransformation animation, when even x & y translations are running
       path.addCircle(child.getX() + centerX, child.getY() + centerY, radius, Path.Direction.CW);
-
-      child.invalidateOutline();
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        child.invalidateOutline();
+      }
       canvas.clipPath(path, op);
       return true;
     }
