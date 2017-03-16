@@ -35,6 +35,14 @@ public class RevealLinearLayout extends LinearLayout implements RevealViewGroup 
     }
   }
 
+  public void setViewRevealManager(ViewRevealManager manager) {
+    if (manager == null) {
+      throw new NullPointerException("ViewRevealManager is null");
+    }
+
+    this.manager = manager;
+  }
+
   @Override public ViewRevealManager getViewRevealManager() {
     return manager;
   }

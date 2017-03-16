@@ -21,18 +21,26 @@ public class RevealFrameLayout extends FrameLayout implements RevealViewGroup {
 
   public RevealFrameLayout(Context context, AttributeSet attrs, int defStyle) {
     super(context, attrs, defStyle);
+
     manager = new ViewRevealManager();
   }
 
   @Override protected boolean drawChild(Canvas canvas, View child, long drawingTime) {
     try {
       canvas.save();
-
-      manager.transform(canvas, child);
-      return super.drawChild(canvas, child, drawingTime);
+      return manager.transform(canvas, child)
+          & super.drawChild(canvas, child, drawingTime);
     } finally {
       canvas.restore();
     }
+  }
+
+  public void setViewRevealManager(ViewRevealManager manager) {
+    if (manager == null) {
+      throw new NullPointerException("ViewRevealManager is null");
+    }
+
+    this.manager = manager;
   }
 
   @Override public ViewRevealManager getViewRevealManager() {

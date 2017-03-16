@@ -1,7 +1,6 @@
 package io.codetail.animation;
 
 import android.animation.Animator;
-import android.animation.ObjectAnimator;
 import android.view.View;
 import io.codetail.animation.ViewRevealManager.ChangeViewLayerTypeAdapter;
 import io.codetail.view.BuildConfig;
@@ -67,20 +66,21 @@ public final class ViewAnimationUtils {
       throw new IllegalArgumentException("Parent must be instance of RevealViewGroup");
     }
 
-    RevealViewGroup viewGroup = (RevealViewGroup) view.getParent();
-    ViewRevealManager rm = viewGroup.getViewRevealManager();
+    final RevealViewGroup viewGroup = (RevealViewGroup) view.getParent();
+    final ViewRevealManager rm = viewGroup.getViewRevealManager();
 
-    if (!rm.hasCustomerRevealAnimator() && LOLLIPOP_PLUS) {
+    if (!rm.overrideNativeAnimator() && LOLLIPOP_PLUS) {
       return android.view.ViewAnimationUtils.createCircularReveal(view, centerX, centerY,
           startRadius, endRadius);
     }
 
-    RevealValues viewData = new RevealValues(view, centerX, centerY, startRadius, endRadius);
-    ObjectAnimator animator = rm.createAnimator(viewData);
+    final RevealValues viewData = new RevealValues(view, centerX, centerY, startRadius, endRadius);
+    final Animator animator = rm.dispatchCreateAnimator(viewData);
 
     if (layerType != view.getLayerType()) {
       animator.addListener(new ChangeViewLayerTypeAdapter(viewData, layerType));
     }
+
     return animator;
   }
 }

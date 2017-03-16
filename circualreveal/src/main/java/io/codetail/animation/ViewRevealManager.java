@@ -14,78 +14,131 @@ import android.view.View;
 import java.util.HashMap;
 import java.util.Map;
 
+@SuppressWarnings("WeakerAccess")
 public class ViewRevealManager {
   public static final ClipRadiusProperty REVEAL = new ClipRadiusProperty();
 
-  private Map<View, RevealValues> targets = new HashMap<>();
+  private final ViewTransformation viewTransformation;
+  private final Map<View, RevealValues> targets = new HashMap<>();
+  private final Map<Animator, RevealValues> animators = new HashMap<>();
+
+  private final AnimatorListenerAdapter animatorCallback = new AnimatorListenerAdapter() {
+    @Override public void onAnimationStart(Animator animation) {
+      final RevealValues values = getValues(animation);
+      values.clip(true);
+    }
+
+    @Override public void onAnimationCancel(Animator animation) {
+      endAnimation(animation);
+    }
+
+    @Override public void onAnimationEnd(Animator animation) {
+      endAnimation(animation);
+    }
+
+    private void endAnimation(Animator animation) {
+      final RevealValues values = getValues(animation);
+      values.clip(false);
+
+      // Clean up after animation is done
+      targets.remove(values.target);
+      animators.remove(animation);
+    }
+  };
 
   public ViewRevealManager() {
-
+    this(new PathTransformation());
   }
 
-  protected ObjectAnimator createAnimator(RevealValues data) {
-    ObjectAnimator animator =
-        ObjectAnimator.ofFloat(data, REVEAL, data.startRadius, data.endRadius);
+  public ViewRevealManager(ViewTransformation transformation) {
+    this.viewTransformation = transformation;
+  }
 
-    animator.addListener(new AnimatorListenerAdapter() {
-      @Override public void onAnimationStart(Animator animation) {
-        RevealValues values = getValues(animation);
-        values.clip(true);
-      }
+  Animator dispatchCreateAnimator(RevealValues data) {
+    final Animator animator = createAnimator(data);
 
-      @Override public void onAnimationEnd(Animator animation) {
-        RevealValues values = getValues(animation);
-        values.clip(false);
-        targets.remove(values.target());
-      }
-    });
-
+    // Before animation is started keep them
     targets.put(data.target(), data);
+    animators.put(animator, data);
     return animator;
   }
 
-  private static RevealValues getValues(Animator animator) {
-    return (RevealValues) ((ObjectAnimator) animator).getTarget();
+  /**
+   * Create custom animator of circular reveal
+   *
+   * @param data RevealValues contains information of starting & ending points, animation target and
+   * current animation values
+   * @return Animator to manage reveal animation
+   */
+  protected Animator createAnimator(RevealValues data) {
+    final ObjectAnimator animator =
+        ObjectAnimator.ofFloat(data, REVEAL, data.startRadius, data.endRadius);
+
+    animator.addListener(getAnimatorCallback());
+    return animator;
+  }
+
+  protected final AnimatorListenerAdapter getAnimatorCallback() {
+    return animatorCallback;
+  }
+
+  /**
+   * @return Retruns Animator
+   */
+  protected final RevealValues getValues(Animator animator) {
+    return animators.get(animator);
   }
 
   /**
    * @return Map of started animators
    */
-  public final Map<View, RevealValues> getTargets() {
-    return targets;
+  protected final RevealValues getValues(View view) {
+    return targets.get(view);
   }
 
   /**
-   * @return True if you don't want use Android native reveal animator
-   * in order to use your own custom one
+   * @return True if you don't want use Android native reveal animator in order to use your own
+   * custom one
    */
-  protected boolean hasCustomerRevealAnimator() {
+  protected boolean overrideNativeAnimator() {
     return false;
   }
 
   /**
-   * @return True if animation was started and it is still running,
-   * otherwise returns False
+   * @return True if animation was started and it is still running, otherwise returns False
    */
   public boolean isClipped(View child) {
-    RevealValues data = targets.get(child);
+    final RevealValues data = getValues(child);
     return data != null && data.isClipping();
   }
 
   /**
    * Applies path clipping on a canvas before drawing child,
-   * you should save canvas state before transformation and
+   * you should save canvas state before viewTransformation and
    * restore it afterwards
    *
    * @param canvas Canvas to apply clipping before drawing
    * @param child Reveal animation target
-   * @return True if transformation was successfully applied on
-   * referenced child, otherwise child be not the target and
-   * therefore animation was skipped
+   * @return True if viewTransformation was successfully applied on referenced child, otherwise
+   * child be not the target and therefore animation was skipped
    */
-  public boolean transform(Canvas canvas, View child) {
+  public final boolean transform(Canvas canvas, View child) {
     final RevealValues revealData = targets.get(child);
-    return revealData != null && revealData.applyTransformation(canvas, child);
+
+    // Target doesn't has animation values
+    if (revealData == null) {
+      return false;
+    }
+    // Check whether target consistency
+    else if (revealData.target != child) {
+      throw new IllegalStateException("Inconsistency detected, contains incorrect target view");
+    }
+    // View doesn't wants to be clipped therefore transformation is useless
+    else if (!revealData.clipping) {
+      return false;
+    }
+
+    return viewTransformation.transform(canvas, child, revealData);
   }
 
   public static final class RevealValues {
@@ -111,12 +164,6 @@ public class ViewRevealManager {
 
     // Animation target
     View target;
-
-    // Android Canvas is tricky, we cannot clip circles directly with Canvas API
-    // but it is allowed using Path, therefore we use it :|
-    Path path = new Path();
-
-    Region.Op op = Region.Op.REPLACE;
 
     public RevealValues(View target, int centerX, int centerY, float startRadius, float endRadius) {
       this.target = target;
@@ -148,6 +195,31 @@ public class ViewRevealManager {
     public boolean isClipping() {
       return clipping;
     }
+  }
+
+  /**
+   * Custom View viewTransformation extension used for applying different reveal
+   * techniques
+   */
+  interface ViewTransformation {
+
+    /**
+     * Apply view viewTransformation
+     *
+     * @param canvas Main canvas
+     * @param child Target to be clipped & revealed
+     * @return True if viewTransformation is applied, otherwise return fAlse
+     */
+    boolean transform(Canvas canvas, View child, RevealValues values);
+  }
+
+  public static class PathTransformation implements ViewTransformation {
+
+    // Android Canvas is tricky, we cannot clip circles directly with Canvas API
+    // but it is allowed using Path, therefore we use it :|
+    private final Path path = new Path();
+
+    private Region.Op op = Region.Op.REPLACE;
 
     /** @see Canvas#clipPath(Path, Region.Op) */
     public Region.Op op() {
@@ -159,31 +231,18 @@ public class ViewRevealManager {
       this.op = op;
     }
 
-    /**
-     * Applies path clipping on a canvas before drawing child,
-     * you should save canvas state before transformation and
-     * restore it afterwards
-     *
-     * @param canvas Canvas to apply clipping before drawing
-     * @param child Reveal animation target
-     * @return True if transformation was successfully  applied on
-     * referenced child, otherwise child be not the target and
-     * therefore animation was skipped
-     */
-    boolean applyTransformation(Canvas canvas, View child) {
-      if (child != target || !clipping) {
-        return false;
-      }
-
+    @Override public boolean transform(Canvas canvas, View child, RevealValues values) {
       path.reset();
       // trick to applyTransformation animation, when even x & y translations are running
-      path.addCircle(child.getX() + centerX, child.getY() + centerY, radius, Path.Direction.CW);
+      path.addCircle(child.getX() + values.centerX, child.getY() + values.centerY, values.radius,
+          Path.Direction.CW);
 
       canvas.clipPath(path, op);
+
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
         child.invalidateOutline();
       }
-      return true;
+      return false;
     }
   }
 
@@ -199,8 +258,8 @@ public class ViewRevealManager {
     }
 
     @Override public void set(RevealValues data, Float value) {
-      data.radius(value);
-      data.target().invalidate();
+      data.radius = value;
+      data.target.invalidate();
     }
 
     @Override public Float get(RevealValues v) {
