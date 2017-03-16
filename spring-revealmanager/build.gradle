@@ -1,0 +1,23 @@
+apply plugin: 'com.android.library'
+
+android {
+  compileSdkVersion project.compileSDKVersion
+  buildToolsVersion project.buildToolsVersion
+
+  defaultConfig {
+    minSdkVersion project.minSDKVersion
+    targetSdkVersion project.targetSDKVersion
+  }
+
+  buildTypes {
+    release {
+      minifyEnabled false
+      proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+    }
+  }
+}
+
+dependencies {
+  compile project(':circualreveal')
+  compile "com.android.support:support-core-utils:$support_lib_version"
+}
