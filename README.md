@@ -1,3 +1,5 @@
+![Release](https://jitpack.io/v/ozodrukh/CircularReveal.svg)
+
 CircularReveal
 ==============
 
