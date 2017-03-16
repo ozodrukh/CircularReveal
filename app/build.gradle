@@ -2,15 +2,19 @@ apply plugin: 'com.android.application'
 apply plugin: 'com.neenbedankt.android-apt'
 
 android {
-  compileSdkVersion 23
-  buildToolsVersion "23.0.3"
+  compileSdkVersion project.compileSDKVersion
+  buildToolsVersion project.buildToolsVersion
 
   defaultConfig {
-    applicationId "io.codetail.circualrevealsample"
-    minSdkVersion 15
-    targetSdkVersion 23
+    minSdkVersion project.minSDKVersion
+    targetSdkVersion project.targetSDKVersion
     versionCode 1
     versionName "1.0"
+    applicationId "io.codetail.circualrevealsample"
+
+    vectorDrawables {
+      useSupportLibrary = true
+    }
   }
 
   lintOptions {
@@ -21,11 +25,13 @@ android {
 dependencies {
   compile fileTree(dir: 'libs', include: ['*.jar'])
   compile project(':circualreveal')
+  compile project(':spring-revealmanager')
 
-  compile 'com.android.support:appcompat-v7:23.4.0'
-  compile 'com.android.support:recyclerview-v7:23.4.0'
-  compile 'com.android.support:cardview-v7:23.4.0'
-  compile 'com.android.support:design:23.4.0'
+  compile "com.android.support:appcompat-v7:$support_lib_version"
+  compile "com.android.support:recyclerview-v7:$support_lib_version"
+  compile "com.android.support:cardview-v7:$support_lib_version"
+  compile "com.android.support:design:$support_lib_version"
+  compile "com.android.support:support-dynamic-animation:$support_lib_version"
 
   compile 'com.squareup.picasso:picasso:2.5.2'
   compile 'com.jakewharton:butterknife:8.0.1'

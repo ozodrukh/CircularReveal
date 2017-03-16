@@ -5,19 +5,26 @@ import android.graphics.Point;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.animation.SpringForce;
 import android.support.annotation.Nullable;
+import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.view.animation.FastOutLinearInInterpolator;
 import android.support.v7.app.AppCompatActivity;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.VideoView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import com.squareup.picasso.Picasso;
+import io.codetail.animation.SpringViewAnimatorManager;
 import io.codetail.animation.ViewAnimationUtils;
+import io.codetail.animation.ViewRevealManager;
+import io.codetail.widget.RevealFrameLayout;
 
 /**
  * https://www.google.com/design/spec/motion/choreography.html#choreography-radial-reaction
@@ -28,9 +35,10 @@ import io.codetail.animation.ViewAnimationUtils;
   private final static String VIDEO_URL =
       "https://material-design.storage.googleapis.com/publish/material_v_8/material_ext_publish/0B14F_FSUCc01WUt2SFZkbGVuNVk/RR_Point_of_Contact_001.mp4";
 
-  @BindView(R.id.view_stack) ViewGroup stack;
+  @BindView(R.id.view_stack) RevealFrameLayout stack;
   @BindView(R.id.san_francisco) ImageView sanFranciscoView;
   @BindView(R.id.video) VideoView videoView;
+  @BindView(R.id.springSettings) SpringSettingsBottomDialog settingsView;
 
   private int currentViewIndex = 0;
 
@@ -63,6 +71,25 @@ import io.codetail.animation.ViewAnimationUtils;
         }
       });
     }
+
+    final ViewRevealManager revealManager = new ViewRevealManager();
+    final SpringViewAnimatorManager springManager = new SpringViewAnimatorManager();
+    springManager.setDampingRatio(SpringForce.DAMPING_RATIO_NO_BOUNCY);
+    springManager.setStiffness(SpringForce.STIFFNESS_LOW);
+
+    stack.setViewRevealManager(revealManager);
+
+    settingsView.addSwitch("Enable Spring", false, new CompoundButton.OnCheckedChangeListener() {
+      @Override public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        stack.setViewRevealManager(isChecked ? springManager : revealManager);
+      }
+    });
+    settingsView.setAnimatorManager(springManager);
+
+    final BottomSheetBehavior behavior = BottomSheetBehavior.from(settingsView);
+    behavior.setPeekHeight(getResources().getDimensionPixelSize(R.dimen.bottom_peek_height));
+    behavior.setSkipCollapsed(false);
+    behavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
   }
 
   private GestureDetector.OnGestureListener tapDetector =

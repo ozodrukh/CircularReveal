@@ -1,4 +1,4 @@
-<io.codetail.widget.RevealFrameLayout
+<android.support.design.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -6,102 +6,120 @@
     android:layout_height="match_parent"
     android:clipToPadding="false"
     android:clipChildren="false"
-    tools:context=".MainActivity"
-    >
+    tools:context=".MainActivity">
 
-
-  <LinearLayout
-      android:id="@+id/circlesLine"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_gravity="center"
-      android:clipChildren="false"
-      android:clipToPadding="false"
-      android:gravity="center"
-      android:orientation="horizontal"
-      >
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/activator"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/material_gap_large"
-        android:layout_marginRight="@dimen/material_gap_large"
-        app:backgroundTint="#259DF7"
-        app:fabSize="normal"
-        />
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/open_radial_transformation"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/material_gap_large"
-        android:layout_marginRight="@dimen/material_gap_large"
-        app:backgroundTint="#259DF7"
-        app:fabSize="normal"
-        />
-
-    <android.support.design.widget.FloatingActionButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/material_gap_large"
-        android:layout_marginRight="@dimen/material_gap_large"
-        app:backgroundTint="#259DF7"
-        app:fabSize="normal"
-        />
-
-  </LinearLayout>
-
-  <android.support.v7.widget.CardView
-      android:id="@+id/activator_mask"
-      android:layout_width="match_parent"
-      android:layout_height="220dp"
-      android:visibility="invisible"
-      app:cardBackgroundColor="#259DF7"
-      app:cardCornerRadius="0dp"
-      app:elevation="2dp"
-      />
-
-  <LinearLayout
-      android:id="@+id/cardsLine"
+  <io.codetail.widget.RevealFrameLayout
+      android:id="@+id/parent"
       android:layout_width="match_parent"
       android:layout_height="match_parent"
-      android:layout_gravity="center"
-      android:visibility="invisible"
-      android:gravity="center"
-      android:orientation="horizontal"
-      >
+      android:clipToPadding="false"
+      android:clipChildren="false">
+
+    <LinearLayout
+        android:id="@+id/circlesLine"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+      <android.support.design.widget.FloatingActionButton
+          android:id="@+id/activator"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginLeft="@dimen/material_gap_large"
+          android:layout_marginRight="@dimen/material_gap_large"
+          android:tint="@color/cardview_light_background"
+          app:srcCompat="@drawable/ic_looks_one_black_24dp"
+          app:backgroundTint="#259DF7"
+          app:fabSize="normal"
+      />
+
+      <android.support.design.widget.FloatingActionButton
+          android:id="@+id/open_radial_transformation"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginLeft="@dimen/material_gap_large"
+          android:layout_marginRight="@dimen/material_gap_large"
+          android:tint="@color/cardview_light_background"
+          app:srcCompat="@drawable/ic_looks_two_black_24dp"
+          app:backgroundTint="#259DF7"
+          app:fabSize="normal"
+      />
+
+      <android.support.design.widget.FloatingActionButton
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginLeft="@dimen/material_gap_large"
+          android:layout_marginRight="@dimen/material_gap_large"
+          app:backgroundTint="#259DF7"
+          app:fabSize="normal"
+      />
+
+    </LinearLayout>
 
     <android.support.v7.widget.CardView
-        android:id="@+id/reset"
-        android:layout_width="@dimen/material_card_width"
-        android:layout_height="@dimen/material_card_height"
-        android:layout_marginLeft="@dimen/material_gap_large"
-        android:layout_marginRight="@dimen/material_gap_large"
+        android:id="@+id/activator_mask"
+        android:layout_width="match_parent"
+        android:layout_height="220dp"
+        android:visibility="invisible"
+        app:cardBackgroundColor="#259DF7"
         app:cardCornerRadius="0dp"
-        app:cardElevation="4dp"
-        />
+        app:elevation="2dp"
+    />
 
-    <android.support.v7.widget.CardView
-        android:id="@id/activator"
-        android:layout_width="@dimen/material_card_width"
-        android:layout_height="@dimen/material_card_height"
-        android:layout_marginLeft="@dimen/material_gap_large"
-        android:layout_marginRight="@dimen/material_gap_large"
-        app:cardCornerRadius="0dp"
-        app:cardElevation="4dp"
-        />
+    <LinearLayout
+        android:id="@+id/cardsLine"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:visibility="invisible"
+        android:gravity="center"
+        android:orientation="horizontal"
+    >
 
-    <android.support.v7.widget.CardView
-        android:id="@id/activator"
-        android:layout_width="@dimen/material_card_width"
-        android:layout_height="@dimen/material_card_height"
-        android:layout_marginLeft="@dimen/material_gap_large"
-        android:layout_marginRight="@dimen/material_gap_large"
-        app:cardCornerRadius="0dp"
-        app:cardElevation="4dp"
-        />
+      <android.support.v7.widget.CardView
+          android:id="@+id/reset"
+          android:layout_width="@dimen/material_card_width"
+          android:layout_height="@dimen/material_card_height"
+          android:layout_marginLeft="@dimen/material_gap_large"
+          android:layout_marginRight="@dimen/material_gap_large"
+          app:cardCornerRadius="0dp"
+          app:cardElevation="4dp"
+      />
 
-  </LinearLayout>
+      <android.support.v7.widget.CardView
+          android:id="@id/activator"
+          android:layout_width="@dimen/material_card_width"
+          android:layout_height="@dimen/material_card_height"
+          android:layout_marginLeft="@dimen/material_gap_large"
+          android:layout_marginRight="@dimen/material_gap_large"
+          app:cardCornerRadius="0dp"
+          app:cardElevation="4dp"
+      />
 
-</io.codetail.widget.RevealFrameLayout>
+      <android.support.v7.widget.CardView
+          android:id="@id/activator"
+          android:layout_width="@dimen/material_card_width"
+          android:layout_height="@dimen/material_card_height"
+          android:layout_marginLeft="@dimen/material_gap_large"
+          android:layout_marginRight="@dimen/material_gap_large"
+          app:cardCornerRadius="0dp"
+          app:cardElevation="4dp"
+      />
+
+    </LinearLayout>
+
+  </io.codetail.widget.RevealFrameLayout>
+
+  <io.codetail.circualrevealsample.SpringSettingsBottomDialog
+      android:id="@+id/springSettings"
+      android:background="#f4f4f4"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      app:layout_behavior="@string/bottom_sheet_behavior"/>
+
+</android.support.design.widget.CoordinatorLayout>
+

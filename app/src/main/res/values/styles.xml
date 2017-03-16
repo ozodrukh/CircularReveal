@@ -77,11 +77,12 @@
     <!-- Floating Action Button (FAB) -->
     <dimen name="fab_inner_circle_offset">8dp</dimen>
     <dimen name="fab_action_icon_size">24dp</dimen>
+    <dimen name="bottom_peek_height">56dp</dimen>
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
-        <item name="colorAccent">#294BCC</item>
+        <item name="colorAccent">#8ae69d</item>
     </style>
 
 </resources>

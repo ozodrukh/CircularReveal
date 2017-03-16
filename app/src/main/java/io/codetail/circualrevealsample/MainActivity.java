@@ -8,7 +8,9 @@ import android.content.Intent;
 import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.animation.SpringForce;
 import android.support.annotation.Nullable;
+import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.view.animation.FastOutLinearInInterpolator;
 import android.support.v4.view.animation.FastOutSlowInInterpolator;
 import android.support.v7.app.AppCompatActivity;
@@ -16,22 +18,28 @@ import android.support.v7.widget.CardView;
 import android.util.Property;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import io.codetail.animation.RevealViewGroup;
+import io.codetail.animation.SpringViewAnimatorManager;
 import io.codetail.animation.ViewAnimationUtils;
+import io.codetail.animation.ViewRevealManager;
+import io.codetail.widget.RevealFrameLayout;
 
 /**
- * Aware section
- * https://www.google.com/design/spec/motion/material-motion.html#material-motion-how-does-material-move
+ * Aware section https://www.google.com/design/spec/motion/material-motion.html#material-motion-how-does-material-move
  */
 public class MainActivity extends AppCompatActivity {
   final static int SLOW_DURATION = 400;
   final static int FAST_DURATION = 200;
 
+  @BindView(R.id.parent) RevealFrameLayout parent;
   @BindView(R.id.circlesLine) ViewGroup circlesLine;
   @BindView(R.id.cardsLine) ViewGroup cardsLine;
   @BindView(R.id.activator_mask) CardView activatorMask;
+  @BindView(R.id.springSettings) SpringSettingsBottomDialog settingsView;
 
   private float maskElevation;
 
@@ -39,6 +47,25 @@ public class MainActivity extends AppCompatActivity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
     ButterKnife.bind(this);
+
+    final ViewRevealManager revealManager = new ViewRevealManager();
+    final SpringViewAnimatorManager springManager = new SpringViewAnimatorManager();
+    springManager.setDampingRatio(SpringForce.DAMPING_RATIO_NO_BOUNCY);
+    springManager.setStiffness(SpringForce.STIFFNESS_LOW);
+
+    parent.setViewRevealManager(revealManager);
+
+    settingsView.addSwitch("Enable Spring", false, new CompoundButton.OnCheckedChangeListener() {
+      @Override public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        parent.setViewRevealManager(isChecked ? springManager : revealManager);
+      }
+    });
+    settingsView.setAnimatorManager(springManager);
+
+    final BottomSheetBehavior behavior = BottomSheetBehavior.from(settingsView);
+    behavior.setPeekHeight(getResources().getDimensionPixelSize(R.dimen.bottom_peek_height));
+    behavior.setSkipCollapsed(false);
+    behavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
   }
 
   @OnClick(R.id.activator) void activateAwareMotion(View target) {
@@ -58,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
     parent.offsetDescendantRectToMyCoords(target, bounds);
     parent.offsetDescendantRectToMyCoords(activatorMask, maskBounds);
 
-    // Put Mask view at circle initial points
+    // Put Mask view at circle 8initial points
     maskElevation = activatorMask.getCardElevation();
     activatorMask.setCardElevation(0);
     activatorMask.setVisibility(View.VISIBLE);
@@ -70,10 +97,11 @@ public class MainActivity extends AppCompatActivity {
     final int cX = maskBounds.centerX();
     final int cY = maskBounds.centerY();
 
+    final float endRadius = (float) Math.hypot(maskBounds.width() * .5f, maskBounds.height() * .5f);
+
     Animator circularReveal =
         ViewAnimationUtils.createCircularReveal(activatorMask, cX, cY, target.getWidth() / 2,
-            (float) Math.hypot(maskBounds.width() * .5f, maskBounds.height() * .5f),
-            View.LAYER_TYPE_HARDWARE);
+            endRadius, View.LAYER_TYPE_HARDWARE);
 
     final float c0X = bounds.centerX() - maskBounds.centerX();
     final float c0Y = bounds.centerY() - maskBounds.centerY();
