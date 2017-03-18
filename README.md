@@ -1,4 +1,4 @@
-![Release](https://jitpack.io/v/ozodrukh/CircularReveal.svg)
+[![](https://www.jitpack.io/v/Ozodrukh/CircularReveal.svg)](https://www.jitpack.io/#Ozodrukh/CircularReveal)
 
 CircularReveal
 ==============
