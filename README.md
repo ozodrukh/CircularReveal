@@ -85,7 +85,7 @@ then add a library dependency
 
 ```groovy
 	dependencies {
-	    compile ('com.github.ozodrukh:CircularReveal:2.0.1@aar') {
+	    implementation ('com.github.ozodrukh:CircularReveal:2.0.1@aar') {
 	        transitive = true;
 	    }
 	}
