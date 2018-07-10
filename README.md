@@ -6,10 +6,10 @@ CircularReveal
 Lollipop ViewAnimationUtils.createCircularReveal for everyone 14+
 
 <a href="http://www.youtube.com/watch?feature=player_embedded&v=tPjpF75-BWA
-" target="_blank">Yotube Video <br /> <img src="http://img.youtube.com/vi/tPjpF75-BWA/0.jpg"
+" target="_blank">Youtube Video <br /> <img src="http://img.youtube.com/vi/tPjpF75-BWA/0.jpg"
 alt="Circular Reveal" width="320" height="240" border="10" /></a>
 
-#### [Checout demo application ](https://github.com/ozodrukh/CircularReveal/releases)
+#### [Checkout demo application ](https://github.com/ozodrukh/CircularReveal/releases)
 
 
 How to use:
